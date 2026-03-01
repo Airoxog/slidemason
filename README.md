@@ -2,9 +2,10 @@
 
 # Slidemason
 
-**Open-source presentation builder that runs locally with your AI coding agent.**
+**Turn your documents into polished presentations in minutes — using the AI coding tools you already have.**
 
-Clone it. Run it in your IDE. Point your favorite coding agent at it —<br>Claude Code, Cursor, Copilot, Windsurf, whatever you use —<br>and it generates polished slide decks from your documents. Runs entirely on your machine.<br>No SaaS. No accounts. No data leaves your laptop.
+No API keys. No environment variables. No accounts to create. No data uploaded anywhere.<br>
+Just clone, run, and tell your AI agent to build the deck.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -18,23 +19,66 @@ Clone it. Run it in your IDE. Point your favorite coding agent at it —<br>Clau
 
 ---
 
-> **Your documents never leave your machine.**
-> Slidemason runs 100% locally. Your source files, briefs, and generated decks live in folders on your filesystem — they are git-ignored by default and never uploaded anywhere. No cloud. No accounts. No third-party access to your internal docs.
-> This isn't just a feature, it's the architecture. Upload your board deck, financials, internal strategy doc — things you'd never paste into a SaaS tool — and generate a polished presentation without any of it touching the internet.
+## What makes this different
+
+**You don't need to sign up for anything.** Most AI presentation tools (Gamma, Beautiful.ai, Tome) require accounts, monthly subscriptions, and your data on their servers. Slidemason is different:
+
+- **Zero configuration** — No API keys, no `.env` files, no secrets, no tokens. Clone the repo and run it.
+- **Uses tools you already have** — If you use Cursor, Windsurf, GitHub Copilot, Claude Code, or any AI coding agent, you already have everything you need. Slidemason is just a project you open in your editor.
+- **100% local** — Your documents, briefs, and generated presentations never leave your machine. Upload your board deck, financials, or internal strategy — none of it touches the internet.
+- **Free and open source** — The only cost is whatever you already pay for your AI coding tool (and most have free tiers).
+
+> **Think of it this way:** You know how your AI coding agent can build websites, fix bugs, and write code? Slidemason gives it a presentation builder to work with. Same agent, same workflow, new superpower.
 
 ---
 
-## Why Slidemason?
+## New to AI coding tools? Start here
 
-| | Traditional tools | Slidemason |
-|---|---|---|
-| **Design** | Pick a template, fight with it | Every slide is bespoke — unique layout, typography, animations |
-| **Data** | Copy-paste into chart wizards | Upload source docs, agent reads and structures everything |
-| **Time** | 2-4 hours per deck | Under 5 minutes |
-| **Cost** | $20-30/mo for Canva/Gamma/Beautiful.ai | Free and open source. Agent costs ~8-40 cents per deck |
-| **Privacy** | Your data on their servers | 100% local. Nothing leaves your machine |
-| **Lock-in** | Proprietary formats | Standard React, JSON, CSS. Everything is readable and versionable |
-| **Agent** | Locked to one AI | Works with Claude Code, Cursor, Copilot, Windsurf, or any coding agent |
+Slidemason is actually a **great first project** if you've been curious about AI-assisted coding but haven't tried it yet. You don't need to know how to code — the AI does the work. You just describe what you want.
+
+### Pick an AI coding tool
+
+These are editors (or terminal tools) where an AI assistant helps you write code. You type instructions in plain English, and it writes the code for you.
+
+| Tool | Free tier? | Best for | Get it |
+|---|---|---|---|
+| **Cursor** | Yes (limited) | Visual editor, feels like VS Code | [cursor.com](https://www.cursor.com/) |
+| **Windsurf** | Yes (generous) | Beginner-friendly, unlimited completions | [windsurf.com](https://windsurf.com/) |
+| **GitHub Copilot** | Yes (limited) | Already use VS Code or GitHub? Start here | [github.com/copilot](https://github.com/features/copilot) |
+| **Claude Code** | Free with API key | Terminal power users, best reasoning | [claude.ai/claude-code](https://docs.anthropic.com/en/docs/claude-code) |
+
+> **Our recommendation:** If you've never used any of these, download **Cursor** or **Windsurf**. They're standalone apps — install, open, and you're ready. Both have free tiers that are more than enough to build presentations.
+
+### Install the prerequisites
+
+You need two things installed on your computer:
+
+**Node.js** (the runtime that runs Slidemason):
+- **Mac:** Open Terminal and run `brew install node` (if you have Homebrew) or download from [nodejs.org](https://nodejs.org/)
+- **Windows:** Download the LTS installer from [nodejs.org](https://nodejs.org/) and run it
+
+**pnpm** (the package manager):
+```bash
+npm install -g pnpm
+```
+
+**Git** (to clone the repo):
+- **Mac:** Run `xcode-select --install` in Terminal (installs Git automatically)
+- **Windows:** Download from [git-scm.com](https://git-scm.com/downloads)
+
+That's it. Three tools, all free, all one-time installs.
+
+### What else can you do with these tools?
+
+Once you have an AI coding tool set up, Slidemason is just the beginning. The same setup lets you:
+
+- **Build websites** — "Create a personal portfolio site with my resume"
+- **Automate tasks** — "Write a script that renames all my photos by date"
+- **Analyze data** — "Read this CSV and make a chart of monthly sales"
+- **Build apps** — "Make a todo app" or "Build a budget tracker"
+- **Learn to code** — "Explain this code to me" or "Teach me how React works"
+
+Slidemason is a great starter project because the feedback loop is instant — you see your slides update in real-time as the AI writes them.
 
 ---
 
@@ -47,27 +91,65 @@ pnpm install
 pnpm dev        # Studio opens at http://localhost:4200
 ```
 
-Open the studio in your browser, fill out a brief, then tell your coding agent to build the deck. That's it. The agent reads `CLAUDE.md` (or the equivalent for your platform) and knows exactly what to do. Your decks are created in `decks/` and git-ignored — they stay on your machine.
+Open the studio in your browser, fill out a brief, then tell your AI agent:
 
-> **Prerequisites:** Node.js 22+, pnpm 10+. Works with any IDE or terminal — VS Code, Cursor, the command line, whatever you prefer.
+> "Read the CLAUDE.md file, then read the brief and source files in decks/my-deck/, and generate the slides."
+
+That's it. The agent reads the instructions and builds the deck. Slides hot-reload as it writes them.
+
+---
+
+## Why Slidemason?
+
+| | Traditional tools | Slidemason |
+|---|---|---|
+| **Setup** | Create account, pick a plan, enter payment | `git clone` and `pnpm dev` — done |
+| **Design** | Pick a template, fight with it | Every slide is bespoke — unique layout, typography, animations |
+| **Data** | Copy-paste into chart wizards | Upload source docs, agent reads and structures everything |
+| **Time** | 2-4 hours per deck | Under 5 minutes |
+| **Cost** | $20-30/mo for Canva/Gamma/Beautiful.ai | Free and open source. Agent costs ~8-40 cents per deck |
+| **Privacy** | Your data on their servers | 100% local. Nothing leaves your machine |
+| **Lock-in** | Proprietary formats | Standard React, JSON, CSS. Readable and versionable |
+| **Agent** | Locked to one AI | Works with Cursor, Windsurf, Copilot, Claude Code, or any agent |
 
 ---
 
 ## Features
 
-- **Local-first and private** — Your decks are git-ignored by default. Source documents, briefs, and slides stay on your machine. Upload your board deck, financials, internal strategy — none of it touches the internet.
-- **Any AI agent** — Works with Claude Code, Cursor, Copilot, Windsurf, or any coding agent. Instructions auto-load from `CLAUDE.md` (symlinked to `.cursorrules`, `.windsurfrules`, `.github/copilot-instructions.md`).
+- **Zero config, zero accounts** — No API keys, no environment variables, no `.env` file. Clone and run.
+- **Any AI agent** — Works with Cursor, Windsurf, GitHub Copilot, Claude Code, or any coding agent. Instructions auto-load via `CLAUDE.md` (symlinked for all platforms).
 - **7-step studio workflow** — Guided sidebar walks you through source files, brief, vision, theme, fonts, branding, and images. Everything saves to a JSON brief your agent reads.
-- **36 slide primitives** — Layout components (`Split`, `Grid`, `Stack`), visual atoms (`Card`, `Badge`, `StatBox`, `IconCircle`), data primitives (`Chart`, `DataTable`), animation toolkit (`Animate`, `CountUp`, `TypeWriter`, `Stagger`), and interactive elements (`Tabs`, `Accordion`, `ClickReveal`, `Flipcard`, `Sortable`).
-- **12 themes** — Each with 31 CSS variables for backgrounds, text, accents, charts, status colors, shadows, and more. Switch themes instantly.
-- **Google Fonts** — Pick heading and body fonts from curated pairings or search the full Google Fonts library.
-- **Branding** — Upload your logo (with placement control), set footer text. The agent places them on every slide.
-- **Deck images** — Upload images and describe them. The agent knows what each image is and uses them in context.
-- **Live preview** — Slides hot-reload in the studio as the agent writes them. Arrow keys to navigate.
-- **Export to PPTX** — One-click PowerPoint export from the sidebar. PDF export via Playwright.
-- **Crash-proof primitives** — Invalid props fall back gracefully instead of white-screening. AI agents can pass bad values without killing the deck.
-- **Deck validation API** — `GET /__api/decks/:slug/validate` renders every slide server-side and reports errors. Agents can self-correct before you even see the deck.
-- **Open and inspectable** — Briefs are JSON, slides are TSX, themes are CSS. Everything is readable and version-controllable.
+- **36 slide primitives** — Layout (`Split`, `Grid`, `Stack`), visual (`Card`, `Badge`, `StatBox`, `IconCircle`), data (`Chart`, `DataTable`), animation (`Animate`, `CountUp`, `TypeWriter`, `Stagger`), and interactive (`Tabs`, `Accordion`, `ClickReveal`, `Flipcard`, `Sortable`).
+- **12 beautiful themes** — Dark, light, colorful, corporate. Switch instantly.
+- **Google Fonts** — Curated pairings or search the full library.
+- **Branding** — Upload your logo (with placement control) and set footer text.
+- **Live preview** — Slides hot-reload as the agent writes them.
+- **Export to PPTX** — One-click PowerPoint export. PDF export via Playwright.
+- **Crash-proof** — Invalid props fall back gracefully. AI agents can make mistakes without killing the deck.
+- **Open and inspectable** — Briefs are JSON, slides are TSX, themes are CSS.
+
+---
+
+## Themes
+
+12 themes, each with 31 CSS variables for complete visual control:
+
+| Theme | Vibe | Background | Primary | Secondary |
+|---|---|---|---|---|
+| `midnight` | Deep space | ![#0f172a](https://img.shields.io/badge/-%230f172a?style=flat-square&color=0f172a) `#0f172a` | ![#6366f1](https://img.shields.io/badge/-%236366f1?style=flat-square&color=6366f1) Indigo | ![#a78bfa](https://img.shields.io/badge/-%23a78bfa?style=flat-square&color=a78bfa) Violet |
+| `slate` | Modern dark | ![#1e1e2e](https://img.shields.io/badge/-%231e1e2e?style=flat-square&color=1e1e2e) `#1e1e2e` | ![#8b5cf6](https://img.shields.io/badge/-%238b5cf6?style=flat-square&color=8b5cf6) Purple | ![#06b6d4](https://img.shields.io/badge/-%2306b6d4?style=flat-square&color=06b6d4) Cyan |
+| `noir` | Stark monochrome | ![#0a0a0a](https://img.shields.io/badge/-%230a0a0a?style=flat-square&color=0a0a0a) `#0a0a0a` | ![#ffffff](https://img.shields.io/badge/-%23ffffff?style=flat-square&color=ffffff) White | ![#a3a3a3](https://img.shields.io/badge/-%23a3a3a3?style=flat-square&color=a3a3a3) Gray |
+| `signal` | Electric accent | ![#0c0a1d](https://img.shields.io/badge/-%230c0a1d?style=flat-square&color=0c0a1d) `#0c0a1d` | ![#00ff88](https://img.shields.io/badge/-%2300ff88?style=flat-square&color=00ff88) Green | ![#00bbff](https://img.shields.io/badge/-%2300bbff?style=flat-square&color=00bbff) Blue |
+| `neon` | Cyberpunk glow | ![#0a0a1a](https://img.shields.io/badge/-%230a0a1a?style=flat-square&color=0a0a1a) `#0a0a1a` | ![#ff00ff](https://img.shields.io/badge/-%23ff00ff?style=flat-square&color=ff00ff) Magenta | ![#00ffff](https://img.shields.io/badge/-%2300ffff?style=flat-square&color=00ffff) Cyan |
+| `sunset` | Warm gradient | ![#1e1b4b](https://img.shields.io/badge/-%231e1b4b?style=flat-square&color=1e1b4b) `#1e1b4b` | ![#f97316](https://img.shields.io/badge/-%23f97316?style=flat-square&color=f97316) Orange | ![#ec4899](https://img.shields.io/badge/-%23ec4899?style=flat-square&color=ec4899) Pink |
+| `dawn` | Soft sunrise | ![#faf5ff](https://img.shields.io/badge/-%23faf5ff?style=flat-square&color=faf5ff) `#faf5ff` | ![#7c3aed](https://img.shields.io/badge/-%237c3aed?style=flat-square&color=7c3aed) Violet | ![#db2777](https://img.shields.io/badge/-%23db2777?style=flat-square&color=db2777) Rose |
+| `canvas` | Clean light | ![#fafaf9](https://img.shields.io/badge/-%23fafaf9?style=flat-square&color=fafaf9) `#fafaf9` | ![#2563eb](https://img.shields.io/badge/-%232563eb?style=flat-square&color=2563eb) Blue | ![#7c3aed](https://img.shields.io/badge/-%237c3aed?style=flat-square&color=7c3aed) Violet |
+| `paper` | Minimal print | ![#fffbeb](https://img.shields.io/badge/-%23fffbeb?style=flat-square&color=fffbeb) `#fffbeb` | ![#b45309](https://img.shields.io/badge/-%23b45309?style=flat-square&color=b45309) Amber | ![#92400e](https://img.shields.io/badge/-%2392400e?style=flat-square&color=92400e) Brown |
+| `boardroom` | Corporate polish | ![#1a1a2e](https://img.shields.io/badge/-%231a1a2e?style=flat-square&color=1a1a2e) `#1a1a2e` | ![#0ea5e9](https://img.shields.io/badge/-%230ea5e9?style=flat-square&color=0ea5e9) Sky | ![#10b981](https://img.shields.io/badge/-%2310b981?style=flat-square&color=10b981) Emerald |
+| `forest` | Natural earth | ![#052e16](https://img.shields.io/badge/-%23052e16?style=flat-square&color=052e16) `#052e16` | ![#22c55e](https://img.shields.io/badge/-%2322c55e?style=flat-square&color=22c55e) Green | ![#eab308](https://img.shields.io/badge/-%23eab308?style=flat-square&color=eab308) Gold |
+| `glacier` | Cool clarity | ![#0c1222](https://img.shields.io/badge/-%230c1222?style=flat-square&color=0c1222) `#0c1222` | ![#38bdf8](https://img.shields.io/badge/-%2338bdf8?style=flat-square&color=38bdf8) Sky | ![#818cf8](https://img.shields.io/badge/-%23818cf8?style=flat-square&color=818cf8) Indigo |
+
+Set the theme in the brief and it applies automatically to every slide.
 
 ---
 
@@ -122,36 +204,16 @@ All colors come from theme CSS variables (`var(--sm-primary)`, `var(--sm-surface
 
 ---
 
-## Themes
-
-<table>
-<tr>
-<td><code>midnight</code></td><td><code>slate</code></td><td><code>canvas</code></td><td><code>signal</code></td><td><code>noir</code></td><td><code>dawn</code></td>
-</tr>
-<tr>
-<td><code>boardroom</code></td><td><code>neon</code></td><td><code>forest</code></td><td><code>glacier</code></td><td><code>sunset</code></td><td><code>paper</code></td>
-</tr>
-</table>
-
-Each theme defines 31 CSS custom properties covering backgrounds, text, accents, chart palettes, status colors, shadows, glass effects, and more. Set the theme in the brief and it applies automatically.
-
----
-
 ## Responsive Design
 
-Slidemason slides adapt to any screen — fullscreen monitors, laptop browsers, studio sidebar panels, and everything in between. No fixed aspect ratio, no scale-to-fit hacks. Slides fill the viewport and content reflows naturally, like a responsive web app.
-
-**How it works:**
+Slides adapt to any screen — monitors, laptops, tablets, studio panels. No fixed aspect ratio, no scale-to-fit. Content reflows like a responsive web app.
 
 | Technique | What it does |
 |---|---|
-| **CSS Container Queries (`cqi`/`cqb`)** | All font sizes, padding, and spacing use `clamp()` with container query units instead of viewport units. Sizing resolves against the slide container — not the browser window — so slides look correct whether they're fullscreen or in a narrow studio panel. |
-| **`cqb` vertical spacing** | Vertical gaps in `Stack`, `Grid`, `Stagger`, and `Spacer` scale with container height. On tall screens, spacing stretches proportionally. On short screens, it compresses. Content fills the viewport without overflow. |
-| **Responsive-by-default layouts** | `Grid` auto-collapses columns via `auto-fit`. `Split` stacks panels vertically on narrow containers. `Pipeline` wraps items. No opt-in props needed. |
-| **Flex-centered slides** | Slide layouts use `justify-center` so content is vertically centered in the viewport. No content stuck at the top with wasted space below. |
-| **`container-type: size`** | Set on the slide layout wrapper. This single CSS property enables all `cqi`/`cqb` units for every child component — the foundation that makes everything else work. |
-
-The result: write content once, and it renders well on any screen size. The agent doesn't need to think about breakpoints or screen dimensions — the primitives handle it.
+| **CSS Container Queries (`cqi`/`cqb`)** | Sizing resolves against the slide container — not the browser window. Works correctly fullscreen or in a narrow panel. |
+| **`cqb` vertical spacing** | Vertical gaps scale with container height. On tall screens, spacing stretches. On short screens, it compresses. |
+| **Responsive-by-default layouts** | `Grid` auto-collapses columns. `Split` stacks on narrow screens. No opt-in needed. |
+| **Flex-centered slides** | Content is vertically centered. No wasted space at the top. |
 
 ---
 
@@ -208,7 +270,7 @@ slidemason/
 
 ## AI Agent Cost
 
-Building a polished 15-slide presentation by hand takes most people **2-4 hours**. With Slidemason, it's **under 5 minutes**. The agent cost is cents:
+Building a 15-slide presentation by hand takes 2-4 hours. With Slidemason, it's under 5 minutes. The agent cost is cents:
 
 | Platform | Model | Cost per deck | Cost to fix one slide |
 |---|---|---|---|
