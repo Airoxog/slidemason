@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 1280px;
+      height: 640px;
+      background: #0c1929;
+      color: #f8fafc;
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Subtle mesh gradient background */
+    .mesh {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 15% 80%, rgba(56,189,248,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 85% 20%, rgba(167,139,250,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(56,189,248,0.04) 0%, transparent 60%);
+    }
+
+    /* Thin accent line at top */
+    .top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #38bdf8, #a78bfa, #38bdf8);
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 48px 80px;
+      text-align: center;
+    }
+
+    /* Pill badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      background: rgba(56,189,248,0.1);
+      border: 1px solid rgba(56,189,248,0.25);
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #38bdf8;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+
+    .badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #38bdf8;
+    }
+
+    /* Main title */
+    h1 {
+      font-family: 'Inter', sans-serif;
+      font-size: 82px;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #38bdf8 0%, #a78bfa 50%, #38bdf8 100%);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.03em;
+    }
+
+    /* Subtitle */
+    .subtitle {
+      font-size: 24px;
+      font-weight: 400;
+      color: #8b9db8;
+      max-width: 700px;
+      line-height: 1.5;
+      margin-bottom: 40px;
+    }
+
+    .subtitle strong {
+      color: #f8fafc;
+      font-weight: 600;
+    }
+
+    /* Feature pills row */
+    .pills {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: rgba(22,42,64,0.8);
+      border: 1px solid #1e3a5f;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #c4d4e8;
+    }
+
+    .pill .icon {
+      font-size: 15px;
+    }
+
+    /* Bottom corner info */
+    .bottom {
+      position: absolute;
+      bottom: 28px;
+      left: 80px;
+      right: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1;
+    }
+
+    .github {
+      font-size: 14px;
+      font-weight: 500;
+      color: #5a7a9a;
+      letter-spacing: 0.02em;
+    }
+
+    .tech {
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+      color: #4a6a8a;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="mesh"></div>
+  <div class="top-bar"></div>
+
+  <div class="content">
+    <div class="badge">
+      <span class="dot"></span>
+      Open Source &middot; MIT License
+    </div>
+
+    <h1>Slidemason</h1>
+
+    <p class="subtitle">
+      Turn documents into <strong>polished presentations</strong> in minutes<br>
+      using the AI coding tools you already have
+    </p>
+
+    <div class="pills">
+      <div class="pill"><span class="icon">&#x26A1;</span> No API keys</div>
+      <div class="pill"><span class="icon">&#x1F512;</span> 100% local</div>
+      <div class="pill"><span class="icon">&#x1F3A8;</span> 12 themes</div>
+      <div class="pill"><span class="icon">&#x1F9E9;</span> 36 components</div>
+      <div class="pill"><span class="icon">&#x1F4C4;</span> PDF + PPTX export</div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <span class="github">github.com/erickittelson/slidemason</span>
+    <div class="tech">
+      <span>React 19</span>
+      <span>TypeScript</span>
+      <span>Vite</span>
+      <span>Tailwind</span>
+    </div>
+  </div>
+</body>
+</html>
