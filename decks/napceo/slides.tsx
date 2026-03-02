@@ -324,27 +324,26 @@ const slides = [
     <Badge>UNIT ECONOMICS</Badge>
     <Heading>The numbers don't sleep.</Heading>
     <Spacer size="sm" />
-    <Split ratio="50/50">
-      <Stack gap="sm">
-        <StatBox value="$364" label="LTV — Lifetime Total Zzz's" icon={DollarSign} />
-        <StatBox value="$0.43" label="CAC" icon={Target} />
-        <StatBox value="847:1" label="LTV:CAC Ratio" icon={TrendingUp} />
-      </Stack>
-      <Stack gap="sm">
-        <Card pad="sm">
-          <Stack gap="xs">
-            <Text size="sm" className="font-semibold">Why is CAC so low?</Text>
-            <Text size="xs" muted>Our users literally talk about us in their sleep. Word of mouth costs nothing when the mouth is unconscious.</Text>
-          </Stack>
-        </Card>
-        <Card pad="sm">
-          <Stack gap="xs">
-            <Text size="sm" className="font-semibold">Payback period</Text>
-            <Text size="xs" muted>1.3 naps. The fastest payback in SaaS history. Most users are profitable before they wake up.</Text>
-          </Stack>
-        </Card>
-      </Stack>
-    </Split>
+    <Grid cols={3} gap="sm">
+      <StatBox value="$364" label="LTV — Lifetime Total Zzz's" icon={DollarSign} />
+      <StatBox value="$0.43" label="CAC" icon={Target} />
+      <StatBox value="847:1" label="LTV:CAC Ratio" icon={TrendingUp} />
+    </Grid>
+    <Spacer size="sm" />
+    <Grid cols={2} gap="sm">
+      <Card pad="sm">
+        <Stack gap="xs">
+          <Text size="sm" className="font-semibold">Why is CAC so low?</Text>
+          <Text size="xs" muted>Our users literally talk about us in their sleep. Word of mouth costs nothing when the mouth is unconscious.</Text>
+        </Stack>
+      </Card>
+      <Card pad="sm">
+        <Stack gap="xs">
+          <Text size="sm" className="font-semibold">Payback period</Text>
+          <Text size="xs" muted>1.3 naps. The fastest payback in SaaS history. Most users are profitable before they wake up.</Text>
+        </Stack>
+      </Card>
+    </Grid>
   </Slide>,
 
   /* ── 12. Slack Integration ── */

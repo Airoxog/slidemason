@@ -80,6 +80,14 @@ async function main() {
     });
     await page.waitForTimeout(3000);
 
+    // Close the sidebar so screenshots show only slide content
+    const collapseBtn = page.getByRole('button', { name: 'Collapse sidebar' });
+    if (await collapseBtn.isVisible()) {
+      await collapseBtn.click();
+      await page.waitForTimeout(500);
+      console.log('Sidebar collapsed.');
+    }
+
     // Screenshot each slide
     for (let i = 0; i < slideCount; i++) {
       await page.goto(`${STUDIO_URL}/?slide=${i}#${DECK}`, {
