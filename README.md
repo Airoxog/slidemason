@@ -7,6 +7,7 @@
 No API keys. No environment variables. No accounts to create. No data uploaded anywhere.<br>
 Just clone, run, and tell your AI agent to build the deck.
 
+[![CI](https://github.com/erickittelson/slidemason/actions/workflows/ci.yml/badge.svg)](https://github.com/erickittelson/slidemason/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-61DAFB.svg?logo=react&logoColor=black)](https://react.dev/)
