@@ -33,10 +33,11 @@ function deckPaths(slug: string) {
   const root = resolve(DECKS_DIR, slug);
   const data = resolve(root, 'data');
   const assets = resolve(root, 'data/assets');
+  const brandingDir = resolve(root, 'data/branding');
   const generated = resolve(root, 'generated');
   const brief = resolve(root, 'generated/brief.json');
   const slides = resolve(root, 'slides.tsx');
-  return { root, data, assets, generated, brief, slides };
+  return { root, data, assets, brandingDir, generated, brief, slides };
 }
 
 /** Convert a human-readable name into a URL-safe slug. */
@@ -231,20 +232,28 @@ const fade = {
 };
 
 const slides = [
-  <div key="s1" className="flex flex-1 flex-col items-center justify-center text-center" style={{ padding: 'clamp(2rem, 5vw, 5rem)' }}>
+  <div key="s1" className="flex flex-1 flex-col items-center justify-center text-center" style={{ padding: 'clamp(2rem, 5cqi, 5rem)' }}>
     <motion.h1
       {...fade}
       className="font-extrabold"
       style={{
-        fontSize: 'clamp(3rem, 8vw, 6rem)',
+        fontSize: 'clamp(3rem, 8cqi, 6rem)',
+        fontFamily: 'var(--sm-heading-font, inherit)',
         background: 'linear-gradient(135deg, var(--sm-primary), var(--sm-secondary))',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         lineHeight: 1.1,
       }}
     >
-      New Deck
+      ${name}
     </motion.h1>
+    <motion.p
+      {...fade}
+      transition={{ delay: 0.3, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      style={{ fontSize: 'clamp(1rem, 2.5cqi, 1.5rem)', fontFamily: 'var(--sm-body-font, inherit)', color: 'var(--sm-muted)', marginTop: 'clamp(0.5rem, 2cqb, 1.5rem)' }}
+    >
+      Complete the wizard, then click Build Deck
+    </motion.p>
   </div>,
 ];
 
@@ -373,6 +382,33 @@ async function handleGetAsset(slug: string, name: string, res: ServerResponse) {
   res.end(data);
 }
 
+async function handleUploadBranding(slug: string, req: IncomingMessage, res: ServerResponse) {
+  const paths = deckPaths(slug);
+  await ensureDir(paths.brandingDir);
+  const files = await parseMultipart(req);
+  const saved: string[] = [];
+  for (const { filename, data } of files) {
+    const safe = sanitize(filename);
+    await writeFile(resolve(paths.brandingDir, safe), data);
+    saved.push(safe);
+  }
+  json(res, { filenames: saved }, 201);
+}
+
+async function handleGetBranding(slug: string, name: string, res: ServerResponse) {
+  const paths = deckPaths(slug);
+  const safe = sanitize(name);
+  const target = resolve(paths.brandingDir, safe);
+  if (!(await exists(target))) {
+    json(res, { error: 'not found' }, 404);
+    return;
+  }
+  const data = await readFile(target);
+  const ext = extname(safe);
+  res.writeHead(200, { 'Content-Type': mimeForExt(ext) });
+  res.end(data);
+}
+
 async function handleExportPptx(slug: string, res: ServerResponse, server: ViteDevServer) {
   const paths = deckPaths(slug);
   if (!(await exists(paths.brief))) {
@@ -476,30 +512,35 @@ async function handleValidateDeck(slug: string, res: ServerResponse, server: Vit
   }
 
   try {
-    const mod = await server.ssrLoadModule(paths.slides);
-    const slides = mod.default as import('react').ReactNode[];
+    const content = await readFile(paths.slides, 'utf-8');
 
-    if (!Array.isArray(slides) || slides.length === 0) {
-      json(res, { valid: false, error: 'No slides exported (expected default export of ReactNode[])' });
+    // Check for default export
+    if (!/export\s+default\b/.test(content)) {
+      json(res, { valid: false, error: 'Missing default export (expected `export default slides`)' });
       return;
     }
 
-    const { renderToString } = await import('react-dom/server');
-    const errors: { index: number; error: string }[] = [];
+    // Count <Slide components
+    const slideMatches = content.match(/<Slide[\s\n]/g);
+    const slideCount = slideMatches ? slideMatches.length : 0;
 
-    for (let i = 0; i < slides.length; i++) {
-      try {
-        renderToString(slides[i] as any);
-      } catch (e: any) {
-        errors.push({ index: i, error: e.message });
-      }
+    if (slideCount === 0) {
+      json(res, { valid: false, error: 'No <Slide> components found' });
+      return;
     }
 
-    if (errors.length === 0) {
-      json(res, { valid: true, slideCount: slides.length });
-    } else {
-      json(res, { valid: false, slideCount: slides.length, errors });
+    // Use Vite's transform pipeline to check for compile/import errors.
+    // This catches syntax errors, bad imports, and TypeScript issues
+    // without running into CJS/ESM issues from ssrLoadModule.
+    const url = `/@fs/${paths.slides}`;
+    const result = await server.transformRequest(url);
+
+    if (!result) {
+      json(res, { valid: false, error: 'Transform failed — could not compile slides.tsx' });
+      return;
     }
+
+    json(res, { valid: true, slideCount });
   } catch (e: any) {
     json(res, { valid: false, error: e.message }, 500);
   }
@@ -512,7 +553,47 @@ async function handleValidateDeck(slug: string, res: ServerResponse, server: Vit
 export function studioApiPlugin(): Plugin {
   return {
     name: 'studio-api',
+
+    // Watch slides.tsx files for changes and send HMR events to the browser
+    handleHotUpdate({ file, server }) {
+      const slidesMatch = file.match(/\/decks\/([^/]+)\/slides\.tsx$/);
+      if (slidesMatch) {
+        const slug = slidesMatch[1];
+        // Find the module URL so the browser can re-import it
+        const moduleUrl = `/@fs/${file}`;
+        server.ws.send({
+          type: 'custom',
+          event: 'slidemason:slides-updated',
+          data: { slug, moduleUrl, t: Date.now() },
+        });
+        // Return empty array to prevent Vite's default full-page HMR
+        return [];
+      }
+    },
+
     configureServer(server: ViteDevServer) {
+      // Serve deck assets at /decks/:slug/assets/:name so slides can
+      // reference images with a clean, predictable path.
+      // Also serve branding assets at /decks/:slug/branding/:name for logos.
+      server.middlewares.use(async (req, res, next) => {
+        const url = req.url ?? '';
+        const assetMatch = url.match(/^\/decks\/([^/]+)\/assets\/(.+)$/);
+        if (assetMatch && (req.method ?? 'GET') === 'GET') {
+          const slug = decodeURIComponent(assetMatch[1]);
+          const name = decodeURIComponent(assetMatch[2]);
+          await handleGetAsset(slug, name, res);
+          return;
+        }
+        const brandingMatch = url.match(/^\/decks\/([^/]+)\/branding\/(.+)$/);
+        if (brandingMatch && (req.method ?? 'GET') === 'GET') {
+          const slug = decodeURIComponent(brandingMatch[1]);
+          const name = decodeURIComponent(brandingMatch[2]);
+          await handleGetBranding(slug, name, res);
+          return;
+        }
+        next();
+      });
+
       server.middlewares.use(async (req, res, next) => {
         const url = req.url ?? '';
         const method = req.method ?? 'GET';
@@ -603,6 +684,21 @@ export function studioApiPlugin(): Plugin {
                 await handleDeleteAsset(slug, name, res);
                 return;
               }
+            }
+
+            // /__api/decks/:slug/branding (logo uploads)
+            if (rest === '/branding') {
+              if (method === 'POST') {
+                await handleUploadBranding(slug, req, res);
+                return;
+              }
+            }
+
+            // /__api/decks/:slug/branding/:name
+            const brandingMatch = rest.match(/^\/branding\/(.+)$/);
+            if (brandingMatch && method === 'GET') {
+              await handleGetBranding(slug, decodeURIComponent(brandingMatch[1]), res);
+              return;
             }
 
             // /__api/decks/:slug/slides

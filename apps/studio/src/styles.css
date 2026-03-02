@@ -18,6 +18,12 @@
 @import "@slidemason/themes/paper.css";
 @import "@slidemason/themes/midnight.css";
 
+/* Font defaults — overridden by applyFonts() when user picks a pairing */
+:root {
+  --sm-heading-font: 'Inter', system-ui, sans-serif;
+  --sm-body-font: 'Inter', system-ui, sans-serif;
+}
+
 /* Base styles */
 *, *::before, *::after {
   margin: 0;

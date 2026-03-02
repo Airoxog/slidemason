@@ -21,7 +21,17 @@ export async function exportPdf({ url, slug, slideCount }: ExportPdfOptions): Pr
     throw new Error('slideCount must be at least 1');
   }
 
-  const browser = await chromium.launch();
+  let browser;
+  try {
+    browser = await chromium.launch();
+  } catch (e: any) {
+    if (e.message?.includes("Executable doesn't exist") || e.message?.includes('playwright install')) {
+      throw new Error(
+        'Playwright browsers are not installed. Run `pnpm exec playwright install chromium` to enable PDF export.',
+      );
+    }
+    throw e;
+  }
   try {
     const context = await browser.newContext({
       viewport: VIEWPORT,

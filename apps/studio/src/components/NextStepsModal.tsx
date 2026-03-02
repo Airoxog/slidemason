@@ -2,17 +2,21 @@ import { useEffect, useState } from 'react';
 
 interface NextStepsModalProps {
   slug: string;
+  dataFiles: string[];
   onClose: () => void;
 }
 
-function getPromptText(slug: string) {
-  return `Read the brief at decks/${slug}/generated/brief.json and the source files in decks/${slug}/data/. Follow the design principles in CLAUDE.md to create cinematic, custom-designed slides in decks/${slug}/slides.tsx. Each slide should be unique — bespoke layouts with Tailwind, Framer Motion animations, and Lucide icons.`;
+function getPromptText(slug: string, dataFiles: string[]) {
+  const fileList = dataFiles.length > 0
+    ? dataFiles.map(f => `decks/${slug}/data/${f}`).join(', ')
+    : `decks/${slug}/data/ (list and read every file)`;
+  return `Read CLAUDE.md first. Then read decks/${slug}/generated/brief.json. Then read these source files: ${fileList}. Following CLAUDE.md, write slides to decks/${slug}/slides.tsx. Validate: curl http://localhost:4200/__api/decks/${slug}/validate`;
 }
 
-export function NextStepsModal({ slug, onClose }: NextStepsModalProps) {
+export function NextStepsModal({ slug, dataFiles, onClose }: NextStepsModalProps) {
   const [copied, setCopied] = useState(false);
 
-  const promptText = getPromptText(slug);
+  const promptText = getPromptText(slug, dataFiles);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };

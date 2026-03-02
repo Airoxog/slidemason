@@ -2,6 +2,7 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { toBlob } from 'html-to-image';
 import { SlideLayout } from './SlideLayout';
+import { BrandingOverlay } from './BrandingOverlay';
 import { useDeck } from './DeckProvider';
 
 /* ── SVG Icons ── */
@@ -86,7 +87,8 @@ export function SlideRenderer({
   slides,
   fullWidth = true,
 }: SlideRendererProps) {
-  const { currentSlide, slideCount, direction, next, prev, theme } = useDeck();
+  const { currentSlide, slideCount, direction, next, prev, theme, branding } = useDeck();
+  const logoAt = branding?.logoUrl ? (branding.logoPlacement ?? 'none') : 'none';
 
   const slideRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -176,14 +178,17 @@ export function SlideRenderer({
         </motion.div>
       </AnimatePresence>
 
+      <BrandingOverlay />
+
       {!isPrintMode && (
         <nav aria-label="Slide controls">
-          {/* ── Top-right: Fullscreen ── */}
+          {/* ── Fullscreen — dodge logo corner ── */}
           <button
             onClick={toggleFullscreen}
-            className="absolute top-5 right-6"
+            className="absolute top-5"
             style={{
               ...glassButton,
+              ...(logoAt === 'top-right' ? { left: '24px' } : { right: '24px' }),
               color: 'var(--sm-muted)',
               opacity: 0.5,
               width: '36px',
@@ -197,10 +202,10 @@ export function SlideRenderer({
             {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
           </button>
 
-          {/* ── Bottom-left: Slide counter + screenshot ── */}
+          {/* ── Slide counter + screenshot — dodge logo corner ── */}
           <div
-            className="absolute bottom-5 left-6 flex items-center gap-3"
-            style={{ zIndex: 10 }}
+            className="absolute bottom-5 flex items-center gap-3"
+            style={{ zIndex: 10, left: logoAt === 'bottom-left' ? '80px' : '24px' }}
           >
             <span
               className="font-mono text-sm tracking-wider"
@@ -235,10 +240,11 @@ export function SlideRenderer({
             </button>
           </div>
 
-          {/* ── Bottom-right: Up / Down navigation ── */}
+          {/* ── Nav arrows — dodge logo corner ── */}
           <div
-            className="absolute bottom-5 right-6 flex flex-col items-center gap-1 rounded-full backdrop-blur-md"
+            className="absolute bottom-5 flex flex-col items-center gap-1 rounded-full backdrop-blur-md"
             style={{
+              right: logoAt === 'bottom-right' ? '80px' : '24px',
               backgroundColor: 'var(--sm-glass-bg)',
               border: '1px solid var(--sm-border)',
               boxShadow: 'var(--sm-shadow-lg)',

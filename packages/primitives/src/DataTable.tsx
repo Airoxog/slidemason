@@ -36,7 +36,7 @@ export function DataTable({
         style={{
           width: '100%',
           borderCollapse: 'collapse',
-          fontSize: compact ? 'clamp(0.6rem, 1cqi, 0.8rem)' : 'clamp(0.7rem, 1.2cqi, 0.9rem)',
+          fontSize: compact ? 'clamp(0.65rem, 1cqi, 0.8rem)' : 'clamp(0.7rem, 1.2cqi, 0.9rem)',
         }}
       >
         <thead>
@@ -49,7 +49,7 @@ export function DataTable({
                   textAlign: 'left',
                   color: 'var(--sm-muted)',
                   fontWeight: 600,
-                  fontSize: 'clamp(0.55rem, 0.9cqi, 0.7rem)',
+                  fontSize: 'clamp(0.65rem, 0.9cqi, 0.7rem)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.08em',
                   borderBottom: '1px solid var(--sm-border)',

@@ -1,6 +1,6 @@
 {
   "name": "slidemason",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Local-first, open-source presentation builder powered by agentic coding workflows",
@@ -16,12 +16,13 @@
     "pnpm": ">=10"
   },
   "scripts": {
-    "dev": "pnpm --filter @slidemason/studio dev",
+    "dev": "tsx scripts/dev-banner.ts && pnpm --filter @slidemason/studio dev",
     "build": "pnpm -r build",
     "test": "vitest run",
     "lint": "eslint .",
     "typecheck": "tsc --build",
-    "capture-demo": "tsx scripts/capture-demo.ts"
+    "capture-demo": "tsx scripts/capture-demo.ts",
+    "postinstall": "playwright install chromium"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

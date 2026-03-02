@@ -23,6 +23,7 @@ export interface Brief {
   dataStyle: string;
   visualStyle: string;
   contentFocus: string;
+  agentLatitude: string;
   extraConstraints: string;
   infoCutoff: string;
   fonts?: { heading: string; body: string };
@@ -34,7 +35,8 @@ export interface Brief {
 const DEFAULT_BRIEF: Brief = {
   title: '', subtitle: '', presenter: '', audience: '', goal: '',
   tone: 'professional', slideCount: '', duration: '', dataStyle: '',
-  visualStyle: '', contentFocus: '', extraConstraints: '', infoCutoff: '',
+  visualStyle: '', contentFocus: '', agentLatitude: 'Collaborative — synthesize and fill gaps, suggest stronger framing',
+  extraConstraints: '', infoCutoff: '',
 };
 
 export function useBrief(slug: string | null) {

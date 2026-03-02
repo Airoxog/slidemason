@@ -5,7 +5,6 @@ interface BrandingUploadProps {
   slug: string;
   branding: BrandingConfig;
   onChange: (branding: BrandingConfig) => void;
-  onUploadLogo: (files: FileList) => void;
 }
 
 const inputStyle: React.CSSProperties = {
@@ -27,26 +26,33 @@ const PLACEMENTS: { value: BrandingConfig['logoPlacement']; label: string }[] = 
   { value: 'none', label: 'No logo on slides' },
 ];
 
-export function BrandingUpload({ slug, branding, onChange, onUploadLogo }: BrandingUploadProps) {
+export function BrandingUpload({ slug, branding, onChange }: BrandingUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDrop = (e: DragEvent) => {
     e.preventDefault();
-    if (e.dataTransfer.files.length) onUploadLogo(e.dataTransfer.files);
+    if (e.dataTransfer.files.length) handleFileChange(e.dataTransfer.files);
   };
 
-  const handleFileChange = (files: FileList | null) => {
+  const handleFileChange = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     const file = files[0];
     const ext = file.name.includes('.') ? file.name.slice(file.name.lastIndexOf('.')) : '.png';
     const logoFilename = `logo${ext}`;
     // Rename the file to logo.<ext> before uploading
     const renamed = new File([file], logoFilename, { type: file.type });
-    const dt = new DataTransfer();
-    dt.items.add(renamed);
-    onUploadLogo(dt.files);
+    const formData = new FormData();
+    formData.append('file', renamed);
+    await fetch(`/__api/decks/${encodeURIComponent(slug)}/branding`, {
+      method: 'POST',
+      body: formData,
+    });
     onChange({ ...branding, logoFilename });
   };
+
+  const logoUrl = branding.logoFilename
+    ? `/__api/decks/${encodeURIComponent(slug)}/branding/${encodeURIComponent(branding.logoFilename)}`
+    : '';
 
   return (
     <div>
@@ -59,7 +65,7 @@ export function BrandingUpload({ slug, branding, onChange, onUploadLogo }: Brand
           padding: '8px', display: 'flex', alignItems: 'center', gap: '10px',
         }}>
           <img
-            src={`/__api/decks/${encodeURIComponent(slug)}/assets/${encodeURIComponent(branding.logoFilename)}`}
+            src={logoUrl}
             alt="Logo"
             style={{ height: '40px', maxWidth: '120px', objectFit: 'contain' }}
           />

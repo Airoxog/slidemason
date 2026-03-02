@@ -77,20 +77,27 @@ export function DeckGallery({ decks, loading, onOpen, onCreate, onDelete }: Deck
       {/* Header */}
       <div style={{
         display: 'flex',
-        alignItems: 'baseline',
-        gap: '12px',
-        marginBottom: '32px',
+        alignItems: 'center',
+        gap: '14px',
+        marginBottom: '36px',
+        paddingBottom: '20px',
+        borderBottom: '1px solid rgba(63,63,70,0.3)',
       }}>
         <h1 style={{
-          fontSize: '1.5rem',
+          fontSize: '1.6rem',
           fontWeight: 700,
           margin: 0,
           color: '#fafafa',
+          letterSpacing: '-0.02em',
         }}>
           Slidemason
         </h1>
         {!loading && (
-          <span style={{ fontSize: '0.85rem', color: '#71717a' }}>
+          <span style={{
+            fontSize: '0.75rem', fontWeight: 500, color: '#a1a1aa',
+            backgroundColor: 'rgba(63,63,70,0.35)',
+            padding: '3px 10px', borderRadius: '10px',
+          }}>
             {decks.length} {decks.length === 1 ? 'deck' : 'decks'}
           </span>
         )}

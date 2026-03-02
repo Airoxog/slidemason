@@ -66,6 +66,7 @@ function monorepoResolvePlugin(): Plugin {
           ...options,
           skipSelf: true,
         });
+        if (!resolved) return null;
         return resolved;
       }
 
@@ -87,6 +88,9 @@ export default defineConfig({
   },
   ssr: {
     external: ['react', 'react-dom', 'framer-motion', 'lucide-react', 'recharts'],
+  },
+  define: {
+    __MONO_ROOT__: JSON.stringify(MONO_ROOT),
   },
   resolve: {
     conditions: ['source'],

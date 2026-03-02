@@ -344,7 +344,17 @@ export async function exportPptx({
   pptx.title = slug;
   pptx.author = 'Slidemason';
 
-  const browser = await chromium.launch();
+  let browser;
+  try {
+    browser = await chromium.launch();
+  } catch (e: any) {
+    if (e.message?.includes("Executable doesn't exist") || e.message?.includes('playwright install')) {
+      throw new Error(
+        'Playwright browsers are not installed. Run `pnpm exec playwright install chromium` to enable PPTX export.',
+      );
+    }
+    throw e;
+  }
   try {
     const page = await browser.newPage();
     await page.setViewportSize({ width: 1920, height: 1080 });

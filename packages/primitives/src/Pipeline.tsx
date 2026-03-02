@@ -69,7 +69,7 @@ export function Pipeline({ items = [], responsive = true, style }: PipelineProps
             {sub && (
               <span
                 style={{
-                  fontSize: 'clamp(0.55rem, 0.9cqi, 0.7rem)',
+                  fontSize: 'clamp(0.65rem, 0.9cqi, 0.7rem)',
                   color: 'var(--sm-muted)',
                   marginTop: '0.2rem',
                 }}

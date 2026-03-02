@@ -29,8 +29,10 @@ export function GradientText({
         background: 'linear-gradient(135deg, var(--sm-primary), var(--sm-secondary))',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
+        fontFamily: 'var(--sm-heading-font, inherit)',
         fontSize: SIZES[size] ?? SIZES['hero'],
-        lineHeight: 0.9,
+        lineHeight: 1.2,
+        paddingBottom: '0.1em',
         ...style,
       }}
     >

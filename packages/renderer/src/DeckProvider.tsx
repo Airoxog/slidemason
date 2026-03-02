@@ -1,6 +1,17 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import { useNavigation } from './useNavigation';
 
+export interface Branding {
+  logoUrl?: string;
+  logoPlacement?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'none';
+  footerText?: string;
+}
+
+export interface Fonts {
+  heading?: string;
+  body?: string;
+}
+
 interface DeckContextValue {
   currentSlide: number;
   slideCount: number;
@@ -9,6 +20,8 @@ interface DeckContextValue {
   next: () => void;
   prev: () => void;
   theme: string;
+  branding?: Branding;
+  fonts?: Fonts;
 }
 
 const DeckContext = createContext<DeckContextValue | null>(null);
@@ -23,12 +36,14 @@ interface DeckProviderProps {
   children: ReactNode;
   slideCount: number;
   theme?: string;
+  branding?: Branding;
+  fonts?: Fonts;
 }
 
-export function DeckProvider({ children, slideCount, theme = 'slate' }: DeckProviderProps) {
+export function DeckProvider({ children, slideCount, theme = 'slate', branding, fonts }: DeckProviderProps) {
   const nav = useNavigation(slideCount);
   return (
-    <DeckContext.Provider value={{ ...nav, slideCount, theme }}>
+    <DeckContext.Provider value={{ ...nav, slideCount, theme, branding, fonts }}>
       {children}
     </DeckContext.Provider>
   );

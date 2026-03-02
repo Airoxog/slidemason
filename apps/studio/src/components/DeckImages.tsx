@@ -1,4 +1,4 @@
-import { useRef, type DragEvent } from 'react';
+import { useRef, useEffect, type DragEvent } from 'react';
 import type { DeckImage } from '../hooks/useBrief';
 
 interface DeckImagesProps {
@@ -11,15 +11,26 @@ interface DeckImagesProps {
 }
 
 const IMAGE_EXTS = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'];
-const LOGO_PATTERN = /^logo\.\w+$/i;
 
 export function DeckImages({ slug, assets, images, onImagesChange, onUpload, onRemove }: DeckImagesProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Filter to only image assets, excluding the reserved logo file
+  // Filter to only image assets (logo is stored separately in data/branding/)
   const imageAssets = assets.filter(
-    a => IMAGE_EXTS.includes(a.ext.toLowerCase()) && !LOGO_PATTERN.test(a.name),
+    a => IMAGE_EXTS.includes(a.ext.toLowerCase()),
   );
+
+  // Auto-register new image assets in the brief so the AI agent knows they exist
+  useEffect(() => {
+    const knownFilenames = new Set(images.map(img => img.filename));
+    const newAssets = imageAssets.filter(a => !knownFilenames.has(a.name));
+    if (newAssets.length > 0) {
+      onImagesChange([
+        ...images,
+        ...newAssets.map(a => ({ filename: a.name, description: '' })),
+      ]);
+    }
+  }, [imageAssets.map(a => a.name).join(',')]);
 
   const getDescription = (filename: string): string => {
     return images.find(img => img.filename === filename)?.description ?? '';

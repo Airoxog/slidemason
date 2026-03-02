@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { DeckProvider, SlideRenderer } from '@slidemason/renderer';
+import type { Branding, Fonts } from '@slidemason/renderer';
 import { getMode } from './lib/mode';
 import defaultSlides from './slides';
 import { applyFonts } from './lib/fonts';
+
+declare const __MONO_ROOT__: string;
 
 /* ── Lazy deck imports (NOT eager — allows hot re-import) ── */
 const deckImporters = import.meta.glob<{ default: ReactNode[] }>(
@@ -62,13 +65,21 @@ export function App() {
     if (!activeDeck) { setSlides(defaultSlides); return; }
     const importer = findImporterForSlug(activeDeck);
     if (importer) {
-      importer().then((mod) => setSlides(mod.default));
+      importer().then((mod) => setSlides(mod.default)).catch((err) => {
+        console.error(`[Slidemason] Failed to load slides for "${activeDeck}":`, err);
+        setSlides(defaultSlides);
+      });
     } else {
       // Deck created after dev server started — not in the glob map.
-      // Fall back to a direct dynamic import so new decks work without restart.
-      import(/* @vite-ignore */ `../../../decks/${activeDeck}/slides.tsx`)
+      // Use Vite's /@fs/ absolute path so the dev server resolves the
+      // module correctly (relative paths hit the SPA fallback and fail).
+      const absPath = `/@fs/${__MONO_ROOT__}/decks/${activeDeck}/slides.tsx`;
+      import(/* @vite-ignore */ absPath)
         .then((mod) => setSlides(mod.default))
-        .catch(() => setSlides(defaultSlides));
+        .catch((err) => {
+          console.error(`[Slidemason] Failed to load slides for "${activeDeck}":`, err);
+          setSlides(defaultSlides);
+        });
     }
   }, [activeDeck]);
 
@@ -182,6 +193,17 @@ export function App() {
     saveBrief({ images });
   };
 
+  // Compute resolved branding for the renderer
+  const rendererBranding: Branding | undefined = activeDeck && brief.branding ? {
+    logoUrl: brief.branding.logoFilename
+      ? `/__api/decks/${encodeURIComponent(activeDeck)}/branding/${encodeURIComponent(brief.branding.logoFilename)}`
+      : undefined,
+    logoPlacement: brief.branding.logoPlacement,
+    footerText: brief.branding.footerText || undefined,
+  } : undefined;
+
+  const rendererFonts: Fonts = { heading: headingFont, body: bodyFont };
+
   const handleSaveAll = async () => {
     try {
       await saveBrief({ theme, fonts: { heading: headingFont, body: bodyFont } });
@@ -204,7 +226,7 @@ export function App() {
   // PDF mode: just slides, no chrome
   if (mode === 'pdf') {
     return (
-      <DeckProvider slideCount={slides.length} theme={theme}>
+      <DeckProvider slideCount={slides.length} theme={theme} fonts={rendererFonts}>
         <SlideRenderer slides={slides} />
       </DeckProvider>
     );
@@ -229,16 +251,26 @@ export function App() {
     return (
       <div style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden' }}>
         <Sidebar>
-          <div style={{ padding: '0 0 8px', borderBottom: '1px solid rgba(63,63,70,0.3)', marginBottom: '8px' }}>
+          <div style={{ padding: '0 0 10px', borderBottom: '1px solid rgba(63,63,70,0.3)', marginBottom: '8px' }}>
             <button
               onClick={closeDeck}
               style={{
-                background: 'none', border: 'none', color: '#a1a1aa',
-                cursor: 'pointer', fontSize: '0.8rem', padding: '4px 0',
+                background: 'rgba(63,63,70,0.25)', border: '1px solid rgba(63,63,70,0.4)',
+                color: '#e4e4e7', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 500,
+                padding: '6px 12px', borderRadius: '6px',
                 display: 'flex', alignItems: 'center', gap: '6px',
+                width: '100%', transition: 'background 0.15s ease, border-color 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(139,92,246,0.2)';
+                e.currentTarget.style.borderColor = 'rgba(139,92,246,0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(63,63,70,0.25)';
+                e.currentTarget.style.borderColor = 'rgba(63,63,70,0.4)';
               }}
             >
-              &#x2190; All Decks
+              <span style={{ fontSize: '1rem', lineHeight: 1 }}>&#x2190;</span> All Decks
             </button>
           </div>
 
@@ -270,7 +302,7 @@ export function App() {
           <CollapsibleSection
             step={3} title="Your Vision"
             open={openStep === 3}
-            done={stepsCompleted >= 3}
+            done={!!brief.extraConstraints}
             onToggle={() => { setStepError(''); setOpenStep(openStep === 3 ? 0 : 3); }}
             onNext={() => handleNext(3)}
           >
@@ -282,7 +314,7 @@ export function App() {
 
           <CollapsibleSection
             step={4} title="Theme"
-            open={openStep === 4} done={stepsCompleted >= 4}
+            open={openStep === 4} done={!!brief.theme}
             onToggle={() => { setStepError(''); setOpenStep(openStep === 4 ? 0 : 4); }}
             onNext={() => handleNext(4)}
           >
@@ -292,7 +324,7 @@ export function App() {
           <CollapsibleSection
             step={5} title="Fonts"
             open={openStep === 5}
-            done={stepsCompleted >= 5}
+            done={!!(brief.fonts?.heading && brief.fonts?.body)}
             onToggle={() => { setStepError(''); setOpenStep(openStep === 5 ? 0 : 5); }}
             onNext={() => handleNext(5)}
           >
@@ -314,15 +346,15 @@ export function App() {
               slug={activeDeck}
               branding={brief.branding ?? { logoFilename: '', logoPlacement: 'top-right', footerText: '' }}
               onChange={handleBrandingChange}
-              onUploadLogo={uploadAssets}
             />
           </CollapsibleSection>
 
           <CollapsibleSection
             step={7} title="Deck Images"
             open={openStep === 7}
-            done={assets.length > 0}
+            done={stepsCompleted >= 7}
             onToggle={() => { setStepError(''); setOpenStep(openStep === 7 ? 0 : 7); }}
+            onNext={() => handleNext(7)}
           >
             <DeckImages
               slug={activeDeck}
@@ -346,6 +378,15 @@ export function App() {
             >
               Build Deck
             </button>
+            {slides.length > 1 && (
+              <div style={{
+                padding: '8px 10px', fontSize: '0.7rem', color: 'rgba(148,163,184,0.8)',
+                background: 'rgba(148,163,184,0.06)', borderRadius: '6px',
+                lineHeight: 1.45,
+              }}>
+                <strong style={{ color: 'rgba(148,163,184,1)' }}>Tip:</strong> Close this sidebar and click the expand icon <span style={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>⤢</span> in the top-right to see your slides at full presentation size — this is how the PDF export will look.
+              </div>
+            )}
             {slides.length > 1 && (
               <button
                 onClick={async () => {
@@ -415,9 +456,9 @@ export function App() {
           </div>
         </Sidebar>
 
-        {showNextSteps && activeDeck && <NextStepsModal slug={activeDeck} onClose={() => setShowNextSteps(false)} />}
+        {showNextSteps && activeDeck && <NextStepsModal slug={activeDeck} dataFiles={files.map(f => f.name)} onClose={() => setShowNextSteps(false)} />}
         <main style={{ flex: 1, overflow: 'hidden' }}>
-          <DeckProvider slideCount={slides.length} theme={theme}>
+          <DeckProvider slideCount={slides.length} theme={theme} branding={rendererBranding} fonts={rendererFonts}>
             <SlideRenderer slides={slides} fullWidth={false} />
           </DeckProvider>
         </main>
@@ -427,7 +468,7 @@ export function App() {
 
   // Web mode: full-width viewer with floating UI
   return (
-    <DeckProvider slideCount={slides.length} theme={theme}>
+    <DeckProvider slideCount={slides.length} theme={theme} fonts={rendererFonts}>
       <SlideRenderer slides={slides} />
       <FloatingThemePicker activeTheme={theme} onSelectTheme={setTheme} />
       <SlideThumbnails />

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import type { Brief } from '../hooks/useBrief';
 
 interface BriefFormProps {
@@ -22,7 +23,8 @@ const tooltipStyle: React.CSSProperties = {
   backgroundColor: '#1a1a2e', color: '#ccc', fontSize: '0.7rem', lineHeight: 1.3,
   padding: '6px 10px', borderRadius: '6px', width: '200px', textAlign: 'left',
   border: '1px solid rgba(255,255,255,0.15)', marginTop: '4px',
-  pointerEvents: 'none', zIndex: 10,
+  pointerEvents: 'none', zIndex: 50,
+  boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
 };
 
 const charCountStyle: React.CSSProperties = {
@@ -76,6 +78,13 @@ const CONTENT_FOCUSES = [
   'Educational — teach concepts step by step',
   'Persuasive — build a compelling argument',
   'Status update — progress & metrics',
+  'Evaluation — structured assessment of tools, options, or decisions',
+];
+
+const AGENT_LATITUDES = [
+  'Faithful — organize my content as-is, minimal interpretation',
+  'Collaborative — synthesize and fill gaps, suggest stronger framing',
+  'Expert — take creative ownership, reframe for maximum impact',
 ];
 
 // Field config
@@ -152,6 +161,12 @@ const FIELDS: {
     options: CONTENT_FOCUSES,
   },
   {
+    key: 'agentLatitude', label: 'Creative license', type: 'select', maxLength: 0,
+    tooltip: 'Controls how much creative freedom the AI takes when interpreting your source material and building the narrative.',
+    placeholder: '',
+    options: AGENT_LATITUDES,
+  },
+  {
     key: 'infoCutoff', label: 'Information cutoff', type: 'date', maxLength: 0,
     tooltip: 'Latest date the data should cover. Helps the AI avoid outdated info.',
     placeholder: '',
@@ -160,12 +175,24 @@ const FIELDS: {
 
 function Tooltip({ text }: { text: string }) {
   const [show, setShow] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+
+  const handleEnter = () => {
+    if (ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      setPos({ top: rect.bottom + 4, left: rect.left });
+    }
+    setShow(true);
+  };
+
   return (
     <span
-      style={{ position: 'relative', cursor: 'help', display: 'inline-flex' }}
-      onMouseEnter={() => setShow(true)}
+      ref={ref}
+      style={{ cursor: 'help', display: 'inline-flex' }}
+      onMouseEnter={handleEnter}
       onMouseLeave={() => setShow(false)}
-      onFocus={() => setShow(true)}
+      onFocus={handleEnter}
       onBlur={() => setShow(false)}
       tabIndex={0}
       role="img"
@@ -179,7 +206,15 @@ function Tooltip({ text }: { text: string }) {
       }}>
         ?
       </span>
-      {show && <span style={tooltipStyle}>{text}</span>}
+      {show && pos && createPortal(
+        <span style={{
+          ...tooltipStyle,
+          position: 'fixed',
+          top: pos.top,
+          left: pos.left,
+        }}>{text}</span>,
+        document.body,
+      )}
     </span>
   );
 }
@@ -247,8 +282,8 @@ export function BriefForm({ brief, onChange }: BriefFormProps) {
 
   return (
     <div>
-      {FIELDS.map(f => (
-        <div key={f.key} style={{ marginBottom: '8px' }}>
+      {FIELDS.map((f, i) => (
+        <div key={f.key} style={{ marginBottom: '8px', position: 'relative', zIndex: FIELDS.length - i }}>
           <label htmlFor={`brief-${f.key}`} style={labelStyle}>
             {f.label}
             <Tooltip text={f.tooltip} />

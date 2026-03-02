@@ -26,8 +26,9 @@ export function Heading({
       className={`font-bold ${className}`}
       style={{
         fontSize: SIZES[size] ?? SIZES['lg'],
+        fontFamily: 'var(--sm-heading-font, inherit)',
         color: 'var(--sm-text)',
-        lineHeight: size === 'hero' ? 0.9 : 1.1,
+        lineHeight: size === 'hero' ? 1.15 : 1.2,
         ...style,
       }}
     >

@@ -33,7 +33,7 @@ export function Slide({
       data-pptx-type="slide"
       data-pptx-layout={layout}
       data-pptx-bg={bg}
-      className={`${layoutClasses[layout] ?? layoutClasses['free']} relative overflow-hidden ${className}`}
+      className={`${layoutClasses[layout] ?? layoutClasses['free']} relative overflow-auto ${className}`}
       style={{ padding: PAD, gap: 'clamp(0.5rem, 1.5cqb, 2rem)', ...style }}
     >
       {bg === 'mesh' && (

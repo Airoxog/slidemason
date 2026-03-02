@@ -18,6 +18,8 @@ Slidemason is a local-first, open-source presentation builder. The monorepo is s
 | `apps/studio/` | Vite-based studio with sidebar workflow |
 | `decks/` | Each deck is a folder (e.g. `decks/my-pitch/`) |
 | `decks/<slug>/data/` | Source documents (PDFs, markdown, text, etc.) |
+| `decks/<slug>/data/assets/` | Content images for slides |
+| `decks/<slug>/data/branding/` | Logo file (auto-rendered, don't touch) |
 | `decks/<slug>/generated/brief.json` | Brief file produced by the studio |
 | `decks/<slug>/slides.tsx` | The deck's slide content |
 
@@ -35,9 +37,49 @@ Read `decks/<slug>/generated/brief.json` for audience, goal, tone, theme, fonts,
 
 ### Step 2b: Check Branding & Images
 
-Read `brief.branding` for logo placement and footer text. If `branding.logoFilename` is set, the logo image is at `decks/<slug>/data/assets/<logoFilename>`. Place it on slides according to `branding.logoPlacement` (`top-left`, `top-right`, `bottom-left`, `bottom-right`, or `none`). If `branding.footerText` is set, include it as a subtle footer on each slide.
+**Logo and footer are handled automatically by the renderer.** Do NOT manually place logos or footer text in your slides — the framework reads `brief.branding` and overlays them on every slide in the correct position. The logo file is stored in `decks/<slug>/data/branding/` (separate from content images). You can ignore branding entirely when writing slides.
 
-Check `brief.images[]` for content images the user uploaded. Each entry has a `filename` (file in `decks/<slug>/data/assets/`) and a `description` explaining what it is and how the user wants it used. Reference images in slides using an `<img>` tag with `src` pointing to the asset path. Only use images the user uploaded — do not invent filenames.
+Check `brief.images[]` for content images the user uploaded. Each entry has a `filename` (file in `decks/<slug>/data/assets/`) and a `description` explaining what it is and how the user wants it used. **Also list the `decks/<slug>/data/assets/` directory** — if there are image files (`.png`, `.jpg`, `.svg`, `.webp`) not listed in `brief.images[]`, include them in the deck anyway. They may have been uploaded without a description. Only use images that actually exist on disk — do not invent filenames. Note: `data/assets/` contains only content images — logos are in `data/branding/` and handled automatically.
+
+**VIEW every image before using it.** If you have multimodal capabilities, read/view each image file in `decks/<slug>/data/assets/` so you understand its content, layout, and visual style. This lets you:
+- Design the slide layout to complement the image (use `<Split>` to pair image with text, or give the image its own full slide)
+- Add primitives alongside the image — headings, captions, callout cards that reference specific elements in the image
+- Choose the right sizing — a detailed infographic needs more space than a simple logo or icon
+
+**Image sizing rules — images must NEVER overflow:**
+
+```tsx
+// ALWAYS constrain images to fit within the slide
+<img
+  src="/decks/my-pitch/assets/diagram.svg"
+  alt="Architecture diagram"
+  style={{
+    width: '100%',
+    maxHeight: '60cqb',
+    objectFit: 'contain',
+  }}
+/>
+```
+
+- **Always set `objectFit: 'contain'`** — this scales the image to fit without cropping
+- **Always set `maxHeight`** using `cqb` units (e.g., `60cqb` = 60% of slide height) to prevent vertical overflow
+- **Use `width: '100%'`** so the image fills available width but respects its aspect ratio via `object-fit`
+- **Leave room for a heading** — if a slide has a heading + image, use `maxHeight: '55cqb'` or less
+- **Never set fixed `width` and `height` in pixels** — this breaks on different screen sizes
+
+**Image URLs in slides:** All asset images are served at `/decks/<slug>/assets/<filename>`. Use this URL pattern for all `<img>` tags:
+
+```tsx
+// Correct — served by the studio middleware
+<img src="/decks/my-pitch/assets/chart.png" alt="Revenue chart"
+     style={{ width: '100%', maxHeight: '60cqb', objectFit: 'contain' }} />
+
+// WRONG — filesystem path, not served by Vite
+<img src="/decks/my-pitch/data/assets/chart.png" />
+
+// WRONG — API path works but is ugly
+<img src="/__api/decks/my-pitch/assets/chart.png" />
+```
 
 ### Step 3: Plan the Narrative Arc
 
@@ -53,6 +95,27 @@ Plan the deck structure **BEFORE** writing any code. Use this framework:
 8. **Ask** — Close with a clear call to action (what you need from the audience)
 
 Not every deck needs all eight beats. Adapt based on the source material and the brief's stated goal.
+
+### Step 3a: Read Creative License Level
+
+Read `brief.agentLatitude` to determine how much creative freedom you have. This controls your entire approach to interpreting the source material:
+
+- **Faithful** — Use the source material's own language, structure, and framing. Organize and design the content but do not rewrite arguments, add new angles, or editorialize. The user's words are the deck's words. Your job is layout, visual design, and clear presentation — not content creation.
+
+- **Collaborative** (default) — Synthesize across source documents, fill logical gaps, and strengthen weak arguments. Add context the audience needs that may not be explicit in the sources. Suggest better framing where you see opportunity. The user's intent drives the deck, but you improve the delivery.
+
+- **Expert** — Take strong editorial ownership. Reframe arguments for the target audience. Challenge weak points, cut fluff, restructure for maximum persuasive impact, and add industry context that strengthens the case. The user's goal drives the deck, but you own the storytelling. You may reorganize the narrative arc significantly if it serves the goal better.
+
+**Regardless of creative license level — data sourcing rules:**
+
+1. **Source documents are your primary source of truth.** Numbers, metrics, and claims from `decks/<slug>/data/` can be used directly. Do NOT cite them with `<Source>` — they are the user's own material and linking to local file paths is meaningless in an exported PDF.
+2. **You are encouraged to research externally** to strengthen the story. Use your web search, documentation lookup, or any other tools available to you to find supporting industry data, market stats, benchmarks, or context that makes the deck more compelling.
+3. **Only cite external web sources with `<Source>`.** The `<Source>` primitive is exclusively for data you found via search tools — it must have a real `href` to a public web URL. Never use `<Source>` to link to local files, repo paths, or the user's uploaded documents.
+   ```tsx
+   <StatBox value="340%" label="Agent adoption YoY" />
+   <Source href="https://gartner.com/report-2026">Gartner Emerging Tech Report, Jan 2026</Source>
+   ```
+4. **Never invent data.** If you can't find a real source for a number, use qualitative language instead ("significant growth", "industry-leading") rather than fabricating a figure. An unsourced number destroys credibility.
 
 ### Step 3b: Plan Animation & Interaction
 
@@ -71,8 +134,8 @@ Edit `decks/<slug>/slides.tsx`. Each slide is **bespoke JSX** — a unique desig
 ```tsx
 import {
   Slide, Heading, Text, Badge, Card, GradientText,
-  GhostNumber, Divider, IconCircle, StatBox, Step, Pipeline,
-  Grid, Split, Stack, Row, Spacer, ColorBar,
+  GhostNumber, Divider, IconCircle, StatBox, Step, List, Rating, Pipeline,
+  Grid, Split, Stack, Row, Spacer, ColorBar, Source,
   Animate, CountUp, Stagger, TypeWriter, ProgressReveal,
   Tooltip, ClickReveal, Tabs, Flipcard,
 } from '@slidemason/primitives';
@@ -126,6 +189,35 @@ A successful response looks like `{ "valid": true, "slideCount": 15 }`. If any s
 - Missing required array props on `<Accordion>`, `<DataTable>`, `<Tabs>`, etc.
 - Using `framer-motion` features that don't work in SSR (avoid `useMotionValue` at module scope)
 
+### Step 6: Report Completion
+
+After validation passes, tell the user their deck is ready using this exact format:
+
+```
+Your deck is ready! Refresh the browser to see it:
+
+  http://localhost:4200/#<slug>
+
+**Deck summary:**
+- <N> slides, theme: <theme name>
+- Narrative arc: <1-line summary of the story flow>
+- Animated moments: <count> (list which slides)
+- Interactive elements: <count> (list which slides)
+
+**To review your deck properly:**
+1. Close the sidebar (click ✕ or collapse it) — slides render at ~70% width with it open
+2. Click the expand icon (⤢) in the top-right corner of the slide area to enter fullscreen
+3. Use arrow keys or the nav controls to browse slides at true presentation size
+This is how the PDF export and presented mode will look. Text or layouts that seem small in the sidebar view are often fine at full size — always check fullscreen before requesting changes.
+
+**What you can do next:**
+- Browse slides in fullscreen to review the full deck
+- Reopen the sidebar to click "Export PPTX" or "Export PDF" to download
+- Ask me to tweak wording, visuals, or layout on any slide
+```
+
+Always use this format so users get a consistent, actionable completion message regardless of which AI tool built the deck.
+
 ---
 
 ## Design Principles — FOLLOW THESE
@@ -135,12 +227,17 @@ A successful response looks like `{ "valid": true, "slideCount": 15 }`. If any s
 1. **Every slide is bespoke.** Design a unique layout for each slide's specific content. Never reuse the same layout pattern on consecutive slides.
 2. **Cinematic typography.** Headlines at `text-6xl` to `text-8xl`. Generous whitespace. Let content breathe. Use `clamp()` with `cqi` units for responsive sizing.
 3. **Glass cards for grouped content.** Use `var(--sm-glass-bg)` background + `backdrop-blur-sm` + `1px solid var(--sm-border)` for card containers. Round with `var(--sm-radius)`.
-4. **Gradient text for impact moments.** `linear-gradient(135deg, var(--sm-primary), var(--sm-secondary))` with `WebkitBackgroundClip: 'text'`. Use sparingly — title slide and 1-2 key statements only.
+4. **Gradient text for short phrases only.** `<GradientText>` is for punchy titles and short statements (max 6-8 words). NEVER use it for sentences or paragraphs — the large font size will overflow the slide. For longer text, use `<GradientText>` for the short title and `<Text>` for the explanation below it.
 5. **Animation with purpose.** Nothing animates by default. Use `<Animate>` wrapper or `<Stagger>` only when animation serves the narrative — to land a stat, build tension, or signal a shift. A static slide is often stronger than an animated one.
 6. **Icons as visual anchors.** Lucide icons at 32-48px, colored with theme variables. Every content slide should have icons to break up text.
 7. **Theme variables only — never hardcode colors.** All colors come from `var(--sm-*)` CSS variables. This ensures every theme works.
-8. **Ghost numbers on section dividers.** A massive faded number (text-[12rem], opacity 5-10%) positioned behind the section title. Creates depth.
-9. **Lists when they work, cards when they don't.** A clean bulleted list is sometimes the best design. Use icon card grids for feature comparisons and visual breakdowns. Use simple lists for sequential steps or short items. Choose the format that best serves the content.
+8. **Color must carry meaning.** When using accent colors on cards (via `<ColorBar>`, `borderTop`, `borderLeft`, etc.), every color must communicate something intentional. Three valid strategies:
+   - **Status**: `--sm-success` = good/positive, `--sm-warning` = caution/at-risk, `--sm-danger` = bad/negative
+   - **Uniform**: All items the same color (e.g., all `--sm-primary`) when they are equal/parallel concepts
+   - **Category**: Different colors to show groupings (e.g., `--sm-primary` for infrastructure items, `--sm-secondary` for platform items, `--sm-accent` for semantic items)
+   Never mix colors arbitrarily. If 6 of 8 cards are blue and 2 are purple with no reason, that's confusing — make them all blue or group them by meaning. Use `--sm-chart-1` through `--sm-chart-6` when you need 3+ distinct category colors.
+9. **Ghost numbers on section dividers.** A massive faded number (text-[12rem], opacity 5-10%) positioned behind the section title. Creates depth.
+9. **Lists when they work, cards when they don't.** Use `<List>` for bullet-heavy content — it handles spacing, markers, and density automatically. Use icon card grids for feature comparisons and visual breakdowns. Use `<List ordered>` for sequential steps. Choose the format that best serves the content.
 10. **Container query sizing.** All text uses `clamp(min, Ncqi, max)` with container query units. Never use `vw`/`vh` — always use `cqi` (width-relative) or `cqb` (height-relative) so sizing works in any container.
 11. **Alternate layout density.** Follow a dense, data-heavy slide with a spacious, breathing slide. Rhythm matters.
 12. **Maximum visual variety.** Never repeat the same layout pattern on consecutive slides. Alternate between centered, split, grid, and asymmetric layouts.
@@ -160,7 +257,8 @@ Every slide must be readable at a glance. If a viewer has to squint, the slide h
 | Hero / title text | `clamp(2rem, 7cqi, 5rem)` | `text-6xl` to `text-8xl` | Slide titles, section headers |
 | Body / content text | `clamp(0.85rem, 1.7cqi, 1.2rem)` | `text-lg` to `text-xl` | Bullet points, descriptions |
 | Captions / labels | `clamp(0.65rem, 1.1cqi, 0.85rem)` | `text-sm` to `text-base` | Badges, footnotes, presenter name |
-| Absolute minimum | `0.75rem` (12px) | — | Nothing on any slide may render below this |
+| Content text minimum | `0.75rem` (12px) | — | `<Text>`, `<List>` body text, `<DataTable>` body cells |
+| Decorative label minimum | `0.65rem` (10.4px) | — | Badges, table headers, pipeline sub-labels, rating scores |
 
 ### Gradient Text Readability
 
@@ -179,6 +277,14 @@ Every slide must be readable at a glance. If a viewer has to squint, the slide h
 - Presenter name: use `<Text size="sm">` minimum, never raw inline styles with tiny font sizes.
 - Classification / footer text: `0.75rem` minimum, `var(--sm-muted)` color, never below 12px.
 - These elements should be small but comfortably readable, not microscopic.
+
+### Reviewing & Exporting Your Deck
+
+**Always expand slides before reviewing.** The studio sidebar takes ~30% of the viewport, so slides render at ~70% width in the default view. Content that looks clipped or too small in the sidebar view may be fine at presentation size — and vice versa. Click the expand button (⤢) on any slide to see it at true presentation dimensions. This is what the PDF and presented mode will look like.
+
+**When iterating with an AI agent:** Tell the agent what you see in the *expanded* view, not the sidebar thumbnail. The agent designs for presentation-size containers, not sidebar-width panels. If text looks too small, expand first — it may be fine at full size.
+
+**PDF export** captures the current runtime state — theme, fonts, and all slide content as rendered in the browser. If you've changed the theme via the picker, the PDF reflects that change immediately. The export renders each slide at 2x resolution (192 DPI effective) via headless Chromium, so what you see in fullscreen is what the PDF will look like.
 
 ---
 
@@ -210,20 +316,35 @@ Layout primitives automatically adapt to narrow containers — no opt-in props n
 
 Set `responsive={false}` or `stackOnNarrow={false}` only when you explicitly need fixed columns/panels.
 
-### Content Density Rules
+### Content Density Rules — CRITICAL
 
-To prevent overflow on any screen size, follow these hard limits:
+**Overflowing a slide is a bug.** If content exceeds the slide boundary it gets clipped and looks broken. The slide is rendered in a panel that may be narrower than you expect (sidebar open = ~70% of viewport). Design for that narrower width, not fullscreen.
 
-| Constraint | Limit |
+| Constraint | Hard Limit |
 |---|---|
-| Cards in a grid | Max 4 per slide (use 2x2 grid) |
+| Cards in a grid | Max 4 per slide (prefer a single `<Grid cols={4}>` row, not 2x2) |
 | Items in a pipeline | Max 5 steps |
-| Text lines per card | Max 3 lines (title + 1-2 description lines) |
-| StatBoxes in a row | Max 4 |
+| Text lines per card | Max 2 lines (short title + 1 description line) |
+| StatBoxes per slide | Max 4 in a single row |
+| Charts per slide | Max 1 chart — never combine a chart with stat cards on the same slide |
 | Heading size for content-heavy slides | Use `"lg"` not `"hero"` |
 | Card padding for dense layouts | Use `pad="sm"` |
+| Split slide total elements | Max 1 heading + 1 text block + 1 visual per panel |
+| Spacers on dense slides | Use `"sm"` or omit entirely — never `"lg"` or `"xl"` |
 
-If content doesn't fit, **split across two slides** rather than shrinking further. A second slide is always better than clipped content.
+**Use available width.** Body text, subtitles, and descriptions should use the full slide width. Do not set `maxWidth` below `70cqi` on body text — narrow text columns waste space and push content below the fold. Let text flow naturally to 2 lines across the full width rather than wrapping to 4+ lines in a narrow column.
+
+**Prefer horizontal layouts.** Cards, stats, and steps should be in a single horizontal row (`<Grid cols={N}>` or `<Row>`) rather than stacked vertically. Vertical stacking eats height fast. A `<Grid cols={4}>` row of compact cards fits easily; the same 4 cards stacked vertically will overflow.
+
+**The #1 slide layout mistake:** putting a heading + body text + spacer + cards + another spacer + a second content block on one slide. This ALWAYS overflows. Instead:
+- **Slide A:** Heading + the primary content block (cards or stats)
+- **Slide B:** The secondary content block with its own heading
+
+A second slide is always better than clipped or scrolling content.
+
+**Split layout golden rule:** Each panel in a `<Split>` gets roughly half the slide height. Do not put more than 3-4 elements (heading + text + one visual component) in a single panel. If you need a heading, stat boxes, AND a chart — use a full-width slide layout instead of Split.
+
+**Slide self-check:** Before writing each slide, mentally count the vertical elements. Heading + text + spacer + 3 cards + spacer + another card = 7 vertical blocks. That will overflow. Either remove a spacer and flatten to a single grid, or split into two slides.
 
 ---
 
@@ -246,9 +367,12 @@ When generating slides, **always use primitives** instead of raw `<div>` + inlin
 | `<GhostNumber n>` | Faded background number | `<GhostNumber n={3} />` |
 | `<Divider width?>` | Gradient horizontal rule | `<Divider />` |
 | `<Step n active?>` | Numbered step | `<Step n={1} active>First</Step>` |
+| `<List items ordered? icon? size? gap?>` | Themed bullet/ordered list | `<List items={[{text: 'First', sub: 'Detail'}]} />` |
+| `<Rating label value max? color?>` | Inline score with bar | `<Rating label="Ease of Use" value={4} max={5} />` |
 | `<Pipeline items responsive?>` | Horizontal process flow | `<Pipeline items={[{icon, label, sub}]} />` |
 | `<Chart type data>` | Bar/line/area/pie chart | `<Chart type="bar" data={[...]} series={['rev']} />` |
 | `<DataTable headers rows>` | Themed data table | `<DataTable headers={['Q','Rev']} rows={[['Q1','$2M']]} />` |
+| `<Source href?>` | Citation / attribution | `<Source href="https://...">Gartner, 2025</Source>` |
 
 ### Layout Atoms
 
@@ -303,6 +427,9 @@ When generating slides, **always use primitives** instead of raw `<div>` + inlin
 | `GradientText` | `"md"` \| `"lg"` \| `"hero"` \| `"stat"` |
 | `Card` pad | `"sm"` \| `"md"` \| `"lg"` |
 | `IconCircle` | `"sm"` \| `"md"` \| `"lg"` |
+| `List` size | `"sm"` \| `"md"` |
+| `List` gap | `"xs"` \| `"sm"` \| `"md"` |
+| `Rating` max | default `5` (any positive number) |
 | `Chart` type | `"bar"` \| `"line"` \| `"area"` \| `"pie"` |
 | `DataTable` | default \| `compact` |
 
@@ -430,6 +557,8 @@ For research and data-driven decks, use this arc instead of the pitch framework:
 | `<Chart type="pie">` | Part-of-whole breakdown | Market share, budget allocation |
 | `<DataTable>` | Exact comparisons | Feature matrices, quarterly metrics, pricing tiers |
 | `<StatBox>` | Single headline metric | "45% growth", "$2.3M ARR", "99.9% uptime" |
+| `<Rating>` | Inline score with bar (compact) | "Technology: 4/5", "Ease of Use: 3/5" |
+| `<List>` | Bullet/ordered text lists | Pros/cons, findings, requirements |
 | `<ProgressReveal>` | Single percentage | Completion rate, goal progress |
 
 ### Data Density Rules
@@ -497,6 +626,81 @@ For research and data-driven decks, use this arc instead of the pitch framework:
 
 ---
 
+## Evaluation & Comparison Decks
+
+When `brief.contentFocus` is "Evaluation", the deck is a structured assessment — not a narrative. PoC reports, vendor evaluations, option comparisons, and audit findings all follow this pattern. The key difference: **repeated layouts are expected and intentional** so the audience can compare options apples-to-apples. Design principles #1 and #12 ("never repeat layouts") are suspended for evaluation slides.
+
+### Evaluation Narrative Arc
+
+1. **Agenda** — What's being evaluated, structure of the deck, and evaluation criteria
+2. **Executive Summary** — Top-line findings and overall recommendation (1 slide)
+3. **Criteria** — The evaluation framework — what's being measured and why (optional — can be folded into Agenda)
+4. **Evaluation 1…N** — One slide per option/tool/candidate. Use the **same layout** for each so the audience can compare. Each evaluation slide typically has:
+   - A heading with the option name + an overall score (`<StatBox>`)
+   - A two-column pros/cons layout (`<Split ratio="50/50">`)
+   - Bullet lists in each column (`<List>` primitive)
+   - A rating grid at the bottom (`<Rating>` rows in a `<Stack>`)
+5. **Comparison** — Side-by-side summary of all options (`<DataTable>` or `<Grid>` of `<Rating>` stacks)
+6. **Recommendation** — Final verdict, reasoning, and next steps
+
+### Evaluation Slide Recipe
+
+```tsx
+// Standard evaluation slide — reuse this layout for each option
+<Slide key="eval-1" layout="free">
+  <Row gap="md" align="center">
+    <Heading size="lg">Option A: Aible</Heading>
+    <StatBox value="75%" label="Overall" style={{ padding: '0.5rem 1rem' }} />
+  </Row>
+  <Spacer size="sm" />
+  <Split ratio="50/50">
+    <Card pad="sm" glass>
+      <Text size="sm"><strong>What went well</strong></Text>
+      <List size="sm" gap="xs" items={[
+        { text: <><strong>PDF handling</strong> — Works well with document sets</> },
+        { text: <><strong>Serverless scaling</strong> — Vector DB handles growth</> },
+        { text: <><strong>Ease of use</strong> — No GenAI expertise needed</> },
+      ]} />
+    </Card>
+    <Card pad="sm" glass>
+      <Text size="sm"><strong>What didn't go well</strong></Text>
+      <List size="sm" gap="xs" items={[
+        { text: <><strong>Performance</strong> — 2-3 min response times</> },
+        { text: <><strong>Errors</strong> — Unexplained LLM processing failures</> },
+        { text: <><strong>Format limits</strong> — .doc/.docx not supported well</> },
+      ]} />
+    </Card>
+  </Split>
+  <Spacer size="sm" />
+  <Grid cols={4} gap="sm">
+    <Rating label="Technology" value={4} />
+    <Rating label="Ease of Use" value={5} />
+    <Rating label="Accuracy" value={4} />
+    <Rating label="Performance" value={3} />
+  </Grid>
+</Slide>
+```
+
+### Relaxed Density Rules for Evaluation / Text-Forward Decks
+
+When `brief.visualStyle` is "Text-forward" or `brief.contentFocus` is "Evaluation", the standard content density limits are relaxed:
+
+| Constraint | Standard Limit | Relaxed Limit |
+|---|---|---|
+| Cards in a grid | Max 4 | Up to 6 (3x2) |
+| Text lines per card | Max 2 | Up to 5 |
+| `<List>` items per card | N/A | Up to 6 items |
+| `<Rating>` rows per slide | N/A | Up to 8 |
+| Repeated layouts | Never consecutive | Expected for evaluation slides |
+
+**Use `<List>` for bullet-heavy content** instead of stacking multiple `<Text>` elements — it handles spacing, markers, and density automatically.
+
+**Use `<Rating>` for inline scores** instead of `<StatBox>` — StatBox is designed for hero metrics and takes too much space for dense rating grids. Rating rows are compact enough to stack 6-8 per slide.
+
+**Minimum text sizes on dense slides.** When using relaxed limits (6 cards, 5 lines per card), body text in cards must use `<Text size="sm">` or `<List size="sm">` — never `size="xs"`. The `xs` size is designed for single-line captions, not multi-line card content. On a 6-card grid, `xs` body text becomes unreadable in PDF export. Similarly, avoid `<DataTable compact>` with more than 5 columns — the header and cell text shrinks below comfortable reading size. Split wide tables across two slides or use a non-compact DataTable.
+
+---
+
 ## Layout Patterns
 
 These are **examples to inspire**, not rigid templates. Combine and remix freely.
@@ -531,7 +735,7 @@ The following themes can be specified in the brief. They are applied automatical
 
 1. **NEVER modify files in `packages/renderer/`, `packages/primitives/`, or `packages/themes/`** — these are framework internals.
 2. **ALL presentation content goes in `decks/<slug>/slides.tsx`** — this is the only file you should create or edit per deck.
-3. **Import from `@slidemason/primitives`, `lucide-react`, and optionally `framer-motion`** — use React hooks (`useState`, `useEffect`, etc.) freely for custom interactions.
+3. **Import from `@slidemason/primitives`, `lucide-react`, and optionally `framer-motion`** — use React hooks (`useState`, `useEffect`, etc.) freely for custom interactions. **Do NOT `import React from 'react'`** — the automatic JSX transform handles this.
 4. **Every slide needs a unique `key` prop** — React requires this for arrays.
 5. **Do not add new dependencies** — everything you need is already installed.
 6. **Read ALL files in `decks/<slug>/data/` before generating** — do not skip any source material.
@@ -539,3 +743,6 @@ The following themes can be specified in the brief. They are applied automatical
 8. **Icon names are PascalCase Lucide icons** — e.g., `Database`, `Shield`, `Zap`, `BarChart3`, `Globe`.
 9. **All colors via `var(--sm-*)` variables** — never hardcode hex values like `#fff` or `#000`.
 10. **Use `style={{}}` for theme variables** — Tailwind can't read CSS variables at build time. Use `className` for layout (flex, grid, padding) and `style` for colors and dynamic values.
+11. **Image URLs use `/decks/<slug>/assets/<filename>`** — never use filesystem paths like `/decks/<slug>/data/assets/` or API paths like `/__api/`.
+12. **Only cite external web sources.** Use `<Source href="https://...">` only for data found via search tools with a real public URL. Never cite the user's uploaded source documents — they are internal material. Never invent numbers.
+13. **Do NOT manually place logos or footer text in slides.** Branding is handled automatically by the renderer based on `brief.branding`. Any logo `<img>` tags or footer elements you add will duplicate the automatic overlay.

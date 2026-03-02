@@ -32,6 +32,7 @@ export function Card({
               borderRadius: 'var(--sm-radius)',
             }
           : {}),
+        color: 'var(--sm-text)',
         padding: PADS[pad] ?? PADS['md'],
         ...style,
       }}
