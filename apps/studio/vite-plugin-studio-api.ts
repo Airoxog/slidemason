@@ -421,6 +421,42 @@ async function handleExportPptx(slug: string, res: ServerResponse, server: ViteD
   res.end(buffer);
 }
 
+async function handleExportPdf(slug: string, res: ServerResponse, server: ViteDevServer) {
+  const paths = deckPaths(slug);
+
+  // Count slides
+  let slideCount = 0;
+  if (await exists(paths.slides)) {
+    const content = await readFile(paths.slides, 'utf-8');
+    const matches = content.match(/<Slide[\s\n]/g);
+    slideCount = matches ? matches.length : 0;
+  }
+
+  if (slideCount === 0) {
+    json(res, { error: 'no slides found' }, 400);
+    return;
+  }
+
+  const address = server.httpServer?.address();
+  const port = typeof address === 'object' && address ? address.port : 4200;
+  const baseUrl = `http://localhost:${port}`;
+
+  const { exportPdf } = await server.ssrLoadModule(resolve(MONO_ROOT, 'packages/export/src/pdf.ts'));
+
+  const buffer = await exportPdf({
+    url: baseUrl,
+    slug,
+    slideCount,
+  });
+
+  res.writeHead(200, {
+    'Content-Type': 'application/pdf',
+    'Content-Disposition': `attachment; filename="${slug}.pdf"`,
+    'Content-Length': buffer.length,
+  });
+  res.end(buffer);
+}
+
 async function handleGetSlides(slug: string, res: ServerResponse) {
   const paths = deckPaths(slug);
   if (!(await exists(paths.slides))) {
@@ -580,6 +616,12 @@ export function studioApiPlugin(): Plugin {
             // /__api/decks/:slug/export/pptx
             if (rest === '/export/pptx' && method === 'GET') {
               await handleExportPptx(slug, res, server);
+              return;
+            }
+
+            // /__api/decks/:slug/export/pdf
+            if (rest === '/export/pdf' && method === 'GET') {
+              await handleExportPdf(slug, res, server);
               return;
             }
 

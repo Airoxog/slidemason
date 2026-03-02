@@ -52,6 +52,7 @@ export function App() {
   const [stepError, setStepError] = useState('');
   const [slides, setSlides] = useState<ReactNode[]>(defaultSlides);
   const [exportingPptx, setExportingPptx] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
 
   const activeDeckRef = useRef(activeDeck);
   activeDeckRef.current = activeDeck;
@@ -376,6 +377,39 @@ export function App() {
                 }}
               >
                 {exportingPptx ? 'Exporting PPTX...' : 'Export PPTX'}
+              </button>
+            )}
+            {slides.length > 1 && (
+              <button
+                onClick={async () => {
+                  if (!activeDeck) return;
+                  setExportingPdf(true);
+                  try {
+                    const res = await fetch(`/__api/decks/${encodeURIComponent(activeDeck)}/export/pdf`);
+                    if (!res.ok) throw new Error('Export failed');
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${activeDeck}.pdf`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  } catch (err) {
+                    console.error('PDF export failed:', err);
+                  } finally {
+                    setExportingPdf(false);
+                  }
+                }}
+                disabled={exportingPdf}
+                style={{
+                  width: '100%', padding: '10px', fontSize: '0.8rem', fontWeight: 600,
+                  backgroundColor: exportingPdf ? 'rgba(100,100,100,0.3)' : 'rgba(239,68,68,0.2)',
+                  color: exportingPdf ? '#888' : '#fca5a5',
+                  border: '1px solid rgba(239,68,68,0.3)',
+                  borderRadius: '8px', cursor: exportingPdf ? 'default' : 'pointer',
+                }}
+              >
+                {exportingPdf ? 'Exporting PDF...' : 'Export PDF'}
               </button>
             )}
           </div>
