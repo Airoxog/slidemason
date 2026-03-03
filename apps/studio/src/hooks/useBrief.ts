@@ -4,6 +4,7 @@ export interface BrandingConfig {
   logoFilename: string;
   logoPlacement: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'none';
   footerText: string;
+  footerPlacement: 'top' | 'bottom';
 }
 
 export interface DeckImage {
@@ -49,7 +50,7 @@ export function useBrief(slug: string | null) {
       if (data && typeof data === 'object' && !data.error && Object.keys(data).length > 0) {
         setBrief({ ...DEFAULT_BRIEF, ...data });
       }
-    } catch {}
+    } catch { /* brief fetch is non-critical */ }
   }, [slug]);
 
   const save = useCallback(async (updates?: Partial<Brief>) => {

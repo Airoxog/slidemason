@@ -59,7 +59,7 @@ export function Pipeline({ items = [], responsive = true, style }: PipelineProps
             <span
               className="font-semibold"
               style={{
-                fontSize: 'clamp(0.65rem, 1.2cqi, 0.9rem)',
+                fontSize: 'clamp(0.875rem, 1.5cqi, 1.1rem)',
                 color: 'var(--sm-text)',
                 marginTop: 'clamp(0.5rem, 1cqb, 0.75rem)',
               }}
@@ -69,7 +69,7 @@ export function Pipeline({ items = [], responsive = true, style }: PipelineProps
             {sub && (
               <span
                 style={{
-                  fontSize: 'clamp(0.65rem, 0.9cqi, 0.7rem)',
+                  fontSize: 'clamp(0.875rem, 1.2cqi, 1rem)',
                   color: 'var(--sm-muted)',
                   marginTop: '0.2rem',
                 }}

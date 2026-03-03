@@ -10,7 +10,7 @@ const layoutClasses: Record<Layout, string> = {
   split: 'flex flex-1 items-center',
   grid: 'flex flex-1 flex-col justify-center',
   statement: 'flex flex-1 flex-col items-center justify-center text-center',
-  free: 'flex flex-1 flex-col justify-center',
+  free: 'flex flex-1 flex-col justify-start',
 };
 
 interface SlideProps {

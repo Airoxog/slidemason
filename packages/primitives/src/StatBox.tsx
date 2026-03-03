@@ -51,7 +51,7 @@ export function StatBox({ value, label, icon: Icon, color, style }: StatBoxProps
       </div>
       <div
         style={{
-          fontSize: 'clamp(0.6rem, 1cqi, 0.8rem)',
+          fontSize: 'clamp(0.875rem, 1.3cqi, 1.05rem)',
           color: 'var(--sm-muted)',
           textTransform: 'uppercase',
           letterSpacing: '0.15em',

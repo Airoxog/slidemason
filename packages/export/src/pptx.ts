@@ -351,6 +351,7 @@ export async function exportPptx({
     if (e.message?.includes("Executable doesn't exist") || e.message?.includes('playwright install')) {
       throw new Error(
         'Playwright browsers are not installed. Run `pnpm exec playwright install chromium` to enable PPTX export.',
+        { cause: e },
       );
     }
     throw e;

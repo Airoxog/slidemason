@@ -23,7 +23,7 @@ export function Source({ children, href, style }: SourceProps) {
   return (
     <cite
       style={{
-        fontSize: 'clamp(0.5rem, 0.9cqi, 0.7rem)',
+        fontSize: 'clamp(0.875rem, 1.2cqi, 1rem)',
         color: 'var(--sm-muted)',
         opacity: 0.6,
         fontStyle: 'normal',

@@ -51,6 +51,7 @@ export function App() {
   const [bodyFont, setBodyFont] = useState('Inter');
   const [showNextSteps, setShowNextSteps] = useState(false);
   const [openStep, setOpenStep] = useState(1); // which step is expanded (1-7, 0=none)
+  const [tipIndex, setTipIndex] = useState(0);
   const [stepsCompleted, setStepsCompleted] = useState(0); // highest step advanced past
   const [stepError, setStepError] = useState('');
   const [slides, setSlides] = useState<ReactNode[]>(defaultSlides);
@@ -200,6 +201,7 @@ export function App() {
       : undefined,
     logoPlacement: brief.branding.logoPlacement,
     footerText: brief.branding.footerText || undefined,
+    footerPlacement: brief.branding.footerPlacement || 'bottom',
   } : undefined;
 
   const rendererFonts: Fonts = { heading: headingFont, body: bodyFont };
@@ -226,7 +228,7 @@ export function App() {
   // PDF mode: just slides, no chrome
   if (mode === 'pdf') {
     return (
-      <DeckProvider slideCount={slides.length} theme={theme} fonts={rendererFonts}>
+      <DeckProvider slideCount={slides.length} theme={theme} fonts={rendererFonts} branding={rendererBranding}>
         <SlideRenderer slides={slides} />
       </DeckProvider>
     );
@@ -344,7 +346,7 @@ export function App() {
           >
             <BrandingUpload
               slug={activeDeck}
-              branding={brief.branding ?? { logoFilename: '', logoPlacement: 'top-right', footerText: '' }}
+              branding={brief.branding ?? { logoFilename: '', logoPlacement: 'top-right', footerText: '', footerPlacement: 'bottom' }}
               onChange={handleBrandingChange}
             />
           </CollapsibleSection>
@@ -378,15 +380,28 @@ export function App() {
             >
               Build Deck
             </button>
-            {slides.length > 1 && (
-              <div style={{
-                padding: '8px 10px', fontSize: '0.7rem', color: 'rgba(148,163,184,0.8)',
-                background: 'rgba(148,163,184,0.06)', borderRadius: '6px',
-                lineHeight: 1.45,
-              }}>
-                <strong style={{ color: 'rgba(148,163,184,1)' }}>Tip:</strong> Close this sidebar and click the expand icon <span style={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>⤢</span> in the top-right to see your slides at full presentation size — this is how the PDF export will look.
-              </div>
-            )}
+            {slides.length > 1 && (() => {
+              const tips = [
+                <>Close this sidebar and click the expand icon <span style={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>⤢</span> in the top-right to see your slides at full presentation size — this is how the PDF export will look.</>,
+                <>Best workflow: build your deck, expand it here to review, then go back to your AI coding tool. Use the screenshot button <span style={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>📷</span> to capture slides and paste them to your agent — tell it which slides to change and how. Review the updates, repeat.</>,
+              ];
+              return (
+                <div
+                  onClick={() => setTipIndex((tipIndex + 1) % tips.length)}
+                  style={{
+                    padding: '8px 10px', fontSize: '0.7rem', color: 'rgba(148,163,184,0.8)',
+                    background: 'rgba(148,163,184,0.06)', borderRadius: '6px',
+                    lineHeight: 1.45, cursor: 'pointer', userSelect: 'none',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
+                    <strong style={{ color: 'rgba(148,163,184,1)' }}>Tip {tipIndex + 1}/{tips.length}</strong>
+                    <span style={{ fontSize: '0.6rem', color: 'rgba(148,163,184,0.5)' }}>click for next</span>
+                  </div>
+                  {tips[tipIndex]}
+                </div>
+              );
+            })()}
             {slides.length > 1 && (
               <button
                 onClick={async () => {

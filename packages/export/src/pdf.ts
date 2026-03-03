@@ -28,6 +28,7 @@ export async function exportPdf({ url, slug, slideCount }: ExportPdfOptions): Pr
     if (e.message?.includes("Executable doesn't exist") || e.message?.includes('playwright install')) {
       throw new Error(
         'Playwright browsers are not installed. Run `pnpm exec playwright install chromium` to enable PDF export.',
+        { cause: e },
       );
     }
     throw e;

@@ -10,17 +10,17 @@ export function Badge({ children, style, className = '' }: BadgeProps) {
       data-pptx-type="badge"
       className={className}
       style={{
-        background: 'var(--sm-glass-bg)',
-        backdropFilter: 'blur(12px)',
-        border: '1px solid var(--sm-border)',
-        borderRadius: 'var(--sm-radius)',
-        padding: 'clamp(0.15rem, 0.3cqi, 0.3rem) clamp(0.5rem, 1cqi, 1rem)',
-        fontSize: 'clamp(0.65rem, 1cqi, 0.8rem)',
+        background: 'color-mix(in srgb, var(--sm-primary) 10%, transparent)',
+        border: '1px solid color-mix(in srgb, var(--sm-primary) 20%, transparent)',
+        borderRadius: '9999px',
+        padding: 'clamp(0.1rem, 0.2cqi, 0.15rem) clamp(0.4rem, 0.7cqi, 0.6rem)',
+        fontSize: 'clamp(0.65rem, 0.9cqi, 0.75rem)',
         color: 'var(--sm-muted)',
         textTransform: 'uppercase',
-        letterSpacing: '0.2em',
+        letterSpacing: '0.1em',
         fontWeight: 500,
         display: 'inline-block',
+        lineHeight: 1.4,
         ...style,
       }}
     >

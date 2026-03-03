@@ -250,15 +250,31 @@ Always use this format so users get a consistent, actionable completion message 
 
 Every slide must be readable at a glance. If a viewer has to squint, the slide has failed.
 
-### Minimum Font Sizes
+### Minimum Font Sizes — 14px (0.875rem) Absolute Floor
+
+**Every primitive enforces a minimum of `0.875rem` (14px).** Nothing on any slide renders below this size. All `clamp()` values in the primitives have `0.875rem` as the first parameter.
 
 | Element | Minimum | Recommended | Example |
 |---|---|---|---|
 | Hero / title text | `clamp(2rem, 7cqi, 5rem)` | `text-6xl` to `text-8xl` | Slide titles, section headers |
-| Body / content text | `clamp(0.85rem, 1.7cqi, 1.2rem)` | `text-lg` to `text-xl` | Bullet points, descriptions |
-| Captions / labels | `clamp(0.65rem, 1.1cqi, 0.85rem)` | `text-sm` to `text-base` | Badges, footnotes, presenter name |
-| Content text minimum | `0.75rem` (12px) | — | `<Text>`, `<List>` body text, `<DataTable>` body cells |
-| Decorative label minimum | `0.65rem` (10.4px) | — | Badges, table headers, pipeline sub-labels, rating scores |
+| Body / content text | `clamp(0.875rem, 1.7cqi, 1.2rem)` | `text-lg` to `text-xl` | Bullet points, descriptions |
+| Captions / labels | `clamp(0.875rem, 1.1cqi, 0.95rem)` | `text-sm` to `text-base` | Badges, footnotes, presenter name |
+| **Absolute minimum** | **`0.875rem` (14px)** | — | Nothing on any slide may render below this |
+
+**Text size selection rule:** Use `size="sm"` (not `"xs"`) for all card body text, descriptions, and supporting content. `size="xs"` is reserved for truly decorative labels — badge text, pipeline sub-labels, footnote annotations. If the text communicates information the audience needs to read, it must be `"sm"` or larger. When in doubt, use `"sm"`.
+
+### Writing Concise Content for Readability
+
+Because the 14px floor means text takes up more space, **write shorter**. The primitives enforce readability — your job is to make content fit at that readable size.
+
+- **Card descriptions:** 1-2 short sentences max. Cut filler words. Lead with the key point.
+- **Bullet points:** 8-12 words each. No complete sentences — use fragments that scan fast.
+- **Stat labels:** 2-3 words (e.g., "Monthly Revenue", "Active Users", "Churn Rate").
+- **Badge text:** 3-5 words max (e.g., "Pre-Seed · Q1 2026").
+- **Table cells:** Keep cell content to 2-4 words. Use abbreviations where clear (e.g., "Y" / "N", "$2.1M").
+- **Pipeline sub-labels:** 2-3 words max per step.
+
+**If content doesn't fit at 14px, the content is too long — not the font too large.** Edit the text down rather than trying to shrink fonts. Split across two slides if needed.
 
 ### Gradient Text Readability
 
@@ -275,7 +291,7 @@ Every slide must be readable at a glance. If a viewer has to squint, the slide h
 ### Footer & Attribution
 
 - Presenter name: use `<Text size="sm">` minimum, never raw inline styles with tiny font sizes.
-- Classification / footer text: `0.75rem` minimum, `var(--sm-muted)` color, never below 12px.
+- Classification / footer text: `0.875rem` minimum, `var(--sm-muted)` color, never below 14px.
 - These elements should be small but comfortably readable, not microscopic.
 
 ### Reviewing & Exporting Your Deck
@@ -297,7 +313,7 @@ Slides use **CSS Container Query units** (`cqi`/`cqb`) so all sizing resolves ag
 ### How Sizing Works
 
 All primitives use `clamp(min, preferred-cqi, max)`:
-- **`min`** — absolute floor (e.g., `0.65rem`) so text is always readable
+- **`min`** — absolute floor (`0.875rem` / 14px for all text) so text is always readable
 - **`preferred`** — scales with container width (e.g., `1.7cqi` = 1.7% of container width)
 - **`max`** — cap so text doesn't grow too large on big screens
 - **`cqb`** — used for height-dependent values (e.g., `<Spacer>` vertical spacing)
@@ -322,9 +338,9 @@ Set `responsive={false}` or `stackOnNarrow={false}` only when you explicitly nee
 
 | Constraint | Hard Limit |
 |---|---|
-| Cards in a grid | Max 4 per slide (prefer a single `<Grid cols={4}>` row, not 2x2) |
+| Cards in a grid | Max 4 per row — use `cols={3}` or `cols={4}`. For 5+ items, use two rows (e.g., `cols={3}` with 6 items) |
 | Items in a pipeline | Max 5 steps |
-| Text lines per card | Max 2 lines (short title + 1 description line) |
+| Text lines per card | Max 3 lines (title + 1-2 description lines) at `size="sm"` |
 | StatBoxes per slide | Max 4 in a single row |
 | Charts per slide | Max 1 chart — never combine a chart with stat cards on the same slide |
 | Heading size for content-heavy slides | Use `"lg"` not `"hero"` |
@@ -332,9 +348,11 @@ Set `responsive={false}` or `stackOnNarrow={false}` only when you explicitly nee
 | Split slide total elements | Max 1 heading + 1 text block + 1 visual per panel |
 | Spacers on dense slides | Use `"sm"` or omit entirely — never `"lg"` or `"xl"` |
 
-**Use available width.** Body text, subtitles, and descriptions should use the full slide width. Do not set `maxWidth` below `70cqi` on body text — narrow text columns waste space and push content below the fold. Let text flow naturally to 2 lines across the full width rather than wrapping to 4+ lines in a narrow column.
+**Use available width AND height.** Body text, subtitles, and descriptions should use the full slide width. Do not set `maxWidth` below `70cqi` on body text — narrow text columns waste space and push content below the fold. Let text flow naturally to 2 lines across the full width rather than wrapping to 4+ lines in a narrow column. Similarly, use the vertical space — if a slide has a large empty gap at the bottom, the text is too small or the layout is too compressed. Use `size="sm"` or `size="md"` text (not `"xs"`) so content fills the slide naturally.
 
-**Prefer horizontal layouts.** Cards, stats, and steps should be in a single horizontal row (`<Grid cols={N}>` or `<Row>`) rather than stacked vertically. Vertical stacking eats height fast. A `<Grid cols={4}>` row of compact cards fits easily; the same 4 cards stacked vertically will overflow.
+**Prefer horizontal layouts.** Cards, stats, and steps should be in a single horizontal row (`<Grid cols={N}>` or `<Row>`) rather than stacked vertically. Vertical stacking eats height fast. A `<Grid cols={4}>` row of compact cards fits easily; the same 4 cards stacked vertically will overflow. But don't pack more than 4 items in a single row — 6+ items in one row shrinks each too small. Use `<Grid cols={3}>` or `<Grid cols={4}>` with two rows instead.
+
+**Minimize Spacers.** The `<Slide>` component already provides gap between flex children. Only add `<Spacer size="sm">` when you need an intentional visual break between sections. Never use Spacers inside cards (the card's own padding handles spacing). Unnecessary Spacers steal vertical space from content.
 
 **The #1 slide layout mistake:** putting a heading + body text + spacer + cards + another spacer + a second content block on one slide. This ALWAYS overflows. Instead:
 - **Slide A:** Heading + the primary content block (cards or stats)
@@ -412,11 +430,13 @@ When generating slides, **always use primitives** instead of raw `<div>` + inlin
 
 ### Slide Layouts
 
-- `center` — centered flex column (hero slides, statements)
+- `free` — **top-aligned** flex column (default — use for all content slides: headings, cards, grids, data)
+- `center` — **vertically centered** flex column (hero slides, section breaks, statement slides)
 - `split` — two-panel 35/65 split
-- `grid` — auto-grid based on children
+- `grid` — auto-grid based on children, vertically centered
 - `statement` — centered with extra breathing room
-- `free` — no preset layout (default)
+
+**Layout choice rule:** If the slide has a heading + content flowing downward, use `layout="free"`. If the slide is a title card, section break, or single statement, use `layout="center"`. Content slides should **never** use `layout="center"` — it creates gaps above and below the content that waste vertical space.
 
 ### Size Props
 

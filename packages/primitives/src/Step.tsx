@@ -24,7 +24,7 @@ export function Step({ n, children, active = false, style }: StepProps) {
           justifyContent: 'center',
           background: active ? 'var(--sm-primary)' : 'var(--sm-surface)',
           border: `2px solid ${active ? 'var(--sm-primary)' : 'var(--sm-border)'}`,
-          fontSize: 'clamp(0.6rem, 1cqi, 0.75rem)',
+          fontSize: 'clamp(0.875rem, 1.2cqi, 1rem)',
           fontWeight: 700,
           color: active ? 'var(--sm-bg)' : 'var(--sm-muted)',
           flexShrink: 0,
@@ -34,7 +34,7 @@ export function Step({ n, children, active = false, style }: StepProps) {
       </div>
       <span
         style={{
-          fontSize: 'clamp(0.75rem, 1.4cqi, 1rem)',
+          fontSize: 'clamp(0.875rem, 1.7cqi, 1.2rem)',
           color: 'var(--sm-text)',
           lineHeight: 1.4,
           fontWeight: active ? 600 : 400,

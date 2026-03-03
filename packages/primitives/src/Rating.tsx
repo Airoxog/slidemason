@@ -34,7 +34,7 @@ export function Rating({
       {/* Label */}
       <span
         style={{
-          fontSize: 'clamp(0.65rem, 1.1cqi, 0.8rem)',
+          fontSize: 'clamp(0.875rem, 1.4cqi, 1.1rem)',
           color: 'var(--sm-text)',
           fontWeight: 500,
           flexShrink: 0,
@@ -68,7 +68,7 @@ export function Rating({
       {/* Score */}
       <span
         style={{
-          fontSize: 'clamp(0.65rem, 1cqi, 0.75rem)',
+          fontSize: 'clamp(0.875rem, 1.3cqi, 1.05rem)',
           color: 'var(--sm-muted)',
           fontWeight: 600,
           flexShrink: 0,

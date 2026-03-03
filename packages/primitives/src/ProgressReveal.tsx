@@ -31,7 +31,7 @@ export function ProgressReveal({
     return (
       <div className={className} style={style} data-pptx-type="progress" data-pptx-value={value} data-pptx-label={label || ''}>
         {label && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 'clamp(0.65rem, 1.1cqi, 0.8rem)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 'clamp(0.875rem, 1.4cqi, 1.1rem)' }}>
             <span style={{ color: 'var(--sm-text)' }}>{label}</span>
             <span style={{ color: 'var(--sm-muted)' }}>{value}%</span>
           </div>
@@ -51,7 +51,7 @@ export function ProgressReveal({
             display: 'flex',
             justifyContent: 'space-between',
             marginBottom: 6,
-            fontSize: 'clamp(0.65rem, 1.1cqi, 0.8rem)',
+            fontSize: 'clamp(0.875rem, 1.4cqi, 1.1rem)',
           }}
         >
           <span style={{ color: 'var(--sm-text)' }}>{label}</span>

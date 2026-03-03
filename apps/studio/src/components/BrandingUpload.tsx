@@ -118,7 +118,7 @@ export function BrandingUpload({ slug, branding, onChange }: BrandingUploadProps
       </select>
 
       {/* Footer text */}
-      <label style={{ ...labelStyle, marginTop: '8px' }}>Footer text</label>
+      <label style={{ ...labelStyle, marginTop: '8px' }}>Footer / banner text</label>
       <input
         style={inputStyle}
         value={branding.footerText}
@@ -126,6 +126,21 @@ export function BrandingUpload({ slug, branding, onChange }: BrandingUploadProps
         placeholder="e.g. Confidential — Acme Corp 2026"
         maxLength={120}
       />
+
+      {/* Footer placement */}
+      {branding.footerText && (
+        <>
+          <label style={{ ...labelStyle, marginTop: '8px' }}>Banner placement</label>
+          <select
+            style={inputStyle}
+            value={branding.footerPlacement || 'bottom'}
+            onChange={e => onChange({ ...branding, footerPlacement: e.target.value as 'top' | 'bottom' })}
+          >
+            <option value="bottom">Bottom</option>
+            <option value="top">Top</option>
+          </select>
+        </>
+      )}
     </div>
   );
 }

@@ -11,9 +11,10 @@ export function BrandingOverlay() {
   const { branding } = useDeck();
   if (!branding) return null;
 
-  const { logoUrl, logoPlacement = 'none', footerText } = branding;
+  const { logoUrl, logoPlacement = 'none', footerText, footerPlacement = 'bottom' } = branding;
   const showLogo = logoUrl && logoPlacement !== 'none';
   const showFooter = !!footerText;
+  const isFooterTop = footerPlacement === 'top';
 
   if (!showLogo && !showFooter) return null;
 
@@ -45,11 +46,11 @@ export function BrandingOverlay() {
         <div
           style={{
             position: 'absolute',
-            bottom: '12px',
+            ...(isFooterTop ? { top: '12px' } : { bottom: '12px' }),
             left: 0,
             right: 0,
             textAlign: 'center',
-            fontSize: 'clamp(0.55rem, 1cqi, 0.75rem)',
+            fontSize: 'clamp(0.875rem, 1.2cqi, 1rem)',
             color: 'var(--sm-muted)',
             opacity: 0.5,
             letterSpacing: '0.02em',

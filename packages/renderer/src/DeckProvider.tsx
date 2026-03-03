@@ -5,6 +5,7 @@ export interface Branding {
   logoUrl?: string;
   logoPlacement?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'none';
   footerText?: string;
+  footerPlacement?: 'top' | 'bottom';
 }
 
 export interface Fonts {

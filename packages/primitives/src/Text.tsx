@@ -1,7 +1,7 @@
 const SIZES = {
-  xs: 'clamp(0.65rem, 1.1cqi, 0.85rem)',
-  sm: 'clamp(0.75rem, 1.4cqi, 1.05rem)',
-  md: 'clamp(0.85rem, 1.7cqi, 1.2rem)',
+  xs: 'clamp(0.875rem, 1.5cqi, 1.1rem)',
+  sm: 'clamp(0.875rem, 1.8cqi, 1.3rem)',
+  md: 'clamp(1rem, 2.2cqi, 1.5rem)',
 } as const;
 
 interface TextProps {

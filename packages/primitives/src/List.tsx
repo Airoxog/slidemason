@@ -16,8 +16,8 @@ interface ListProps {
 }
 
 const gapMap = { xs: 'clamp(0.2rem, 0.4cqb, 0.35rem)', sm: 'clamp(0.35rem, 0.7cqb, 0.55rem)', md: 'clamp(0.5rem, 1cqb, 0.75rem)' };
-const textMap = { sm: 'clamp(0.7rem, 1.2cqi, 0.9rem)', md: 'clamp(0.8rem, 1.5cqi, 1.05rem)' };
-const subMap = { sm: 'clamp(0.65rem, 1cqi, 0.75rem)', md: 'clamp(0.65rem, 1.1cqi, 0.85rem)' };
+const textMap = { sm: 'clamp(0.875rem, 1.6cqi, 1.2rem)', md: 'clamp(0.875rem, 1.9cqi, 1.35rem)' };
+const subMap = { sm: 'clamp(0.875rem, 1.3cqi, 1.05rem)', md: 'clamp(0.875rem, 1.5cqi, 1.15rem)' };
 
 export function List({
   items = [],
@@ -66,7 +66,7 @@ export function List({
             ) : ordered ? (
               <span
                 style={{
-                  fontSize: 'clamp(0.6rem, 1cqi, 0.8rem)',
+                  fontSize: 'clamp(0.875rem, 1.3cqi, 1.05rem)',
                   fontWeight: 700,
                   color: 'var(--sm-primary)',
                   minWidth: 'clamp(14px, 2cqi, 20px)',

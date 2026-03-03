@@ -20,11 +20,12 @@ const rowGap = {
   lg: 'clamp(0.75rem, 2cqb, 2rem)',
 };
 
-// Responsive: use auto-fit with a minmax so items wrap naturally
+// Responsive: use auto-fit with cqi-based minmax to prevent extra columns
+// The clamp ensures: collapse on narrow containers, respect cols on wide ones
 const responsiveColumns: Record<number, string> = {
-  2: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
-  3: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
-  4: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))',
+  2: 'repeat(auto-fit, minmax(min(100%, clamp(240px, 40cqi, 800px)), 1fr))',
+  3: 'repeat(auto-fit, minmax(min(100%, clamp(200px, 28cqi, 500px)), 1fr))',
+  4: 'repeat(auto-fit, minmax(min(100%, clamp(180px, 21cqi, 400px)), 1fr))',
 };
 
 export function Grid({ cols = 2, gap = 'md', responsive = true, style, className = '', children }: GridProps) {
@@ -41,6 +42,9 @@ export function Grid({ cols = 2, gap = 'md', responsive = true, style, className
         gridTemplateColumns: columns,
         columnGap: colGap[gap] ?? colGap['md'],
         rowGap: rowGap[gap] ?? rowGap['md'],
+        flex: '1 1 auto',
+        minHeight: 0,
+        alignContent: 'stretch',
         ...style,
       }}
     >
